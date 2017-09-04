@@ -53,19 +53,30 @@ def get_poses(angles):
     return pose ,middle_bin
 
 #Save skeleton robot poses, depending on delay:
-for delay in range(0,50):
+for delay in range(0,4):
     print delay
-    data = pickle.load(open('data_test_1', 'rb'))
+    data = pickle.load(open('raw_data_all', 'rb'))
     # data[id][step][section] = array(dict{skeleton, robot, time})
     poses = {}
 
     for subject_id, step in data.items():           # go over subject
-        print subject_id
         poses[subject_id] = {}
+        print subject_id
+
+
         for step_id, step in step.items():    # go over steps
+            if step_id in [3,6,9]:
+                continue
+            poses[subject_id][step_id]={}
+            poses[subject_id][step_id]['transformation']=data[subject_id][step_id]['transformation']
+            poses[subject_id][step_id]['matrix']=data[subject_id][step_id]['matrix']
+            print step_id
+
             for section_id in ['learn', 'task1', 'task2', 'task3']:
+
                 if section_id in data[subject_id][step_id].keys():
                     print section_id
+
                     section=data[subject_id][step_id][section_id]
 
                     time_stamp = np.zeros([len(section['data']), 1])
@@ -92,23 +103,22 @@ for delay in range(0,50):
                    # skeleton_poses=skeleton_poses[:-3]
                    # pose_bins=pose_bins[:-3]
 
-                robot_poses = robot_angles[[x+delay for x in pose_bins],:]
+                    robot_poses = robot_angles[[x+delay for x in pose_bins],:]
 
-                time_stamp=time_stamp[pose_bins,:]
+                    time_stamp = time_stamp[pose_bins, :]
 
-                affdex = []
+                    affdex = []
 
-                for i in pose_bins:
-                    affdex.append(affdex_data[i])
+                    for i in pose_bins:
+                        affdex.append(affdex_data[i])
 
-                poses[subject_id][section_id] = {
-                    'time': time_stamp,
-                    'skeleton': skeleton_poses,
-                    'robot': robot_poses,
-                    'affdex':affdex
-                }
-
-    pickle.dump(obj=poses, file=open('../physical_curiosity_analysis/data_after_analysis_'+str(delay), 'wb'))
+                    poses[subject_id][step_id][section_id] = {
+                        'time': time_stamp,
+                        'skeleton': skeleton_poses,
+                        'robot': robot_poses,
+                        'affdex':affdex
+                    }
 
 
-#todo - bug fix !
+
+    pickle.dump(obj=poses, file=open('data_of_poses_'+str(delay), 'wb'))
