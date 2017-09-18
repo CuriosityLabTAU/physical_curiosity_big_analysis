@@ -53,13 +53,17 @@ def get_poses(angles):
     return pose ,middle_bin
 
 #Save skeleton robot poses, depending on delay:
-for delay in range(0,4):
+data = pickle.load(open('raw_data_all', 'rb'))
+for delay in range(0,50):
     print delay
-    data = pickle.load(open('raw_data_all', 'rb'))
     # data[id][step][section] = array(dict{skeleton, robot, time})
     poses = {}
 
     for subject_id, step in data.items():           # go over subject
+
+        if subject_id==63.0 or subject_id==67.0 or subject_id==53.0:
+            continue
+
         poses[subject_id] = {}
         print subject_id
 
@@ -70,12 +74,10 @@ for delay in range(0,4):
             poses[subject_id][step_id]={}
             poses[subject_id][step_id]['transformation']=data[subject_id][step_id]['transformation']
             poses[subject_id][step_id]['matrix']=data[subject_id][step_id]['matrix']
-            print step_id
 
             for section_id in ['learn', 'task1', 'task2', 'task3']:
 
                 if section_id in data[subject_id][step_id].keys():
-                    print section_id
 
                     section=data[subject_id][step_id][section_id]
 
@@ -85,6 +87,9 @@ for delay in range(0,4):
 
                     robot_angles=np.zeros([len(section['data']), 8])
 
+                    to_nao=np.zeros([len(section['data']), 8])
+
+
                     affdex_data=[]
 
                     for i, d in enumerate(section['data']): # go over time-steps
@@ -92,6 +97,8 @@ for delay in range(0,4):
                         time_stamp[i,0] = d['time']
 
                         skeleton_angles[i, :] = np.array([float(x) for x in d['skeleton'].split(',')])
+
+                        to_nao[i, :] = np.array([float(x) for x in d['robot_cimmand'].split(';')[1].split(',')])
 
                         robot_angles[i, :] = np.array([float(x) for x in d['robot'].split(',')])
 
@@ -102,6 +109,14 @@ for delay in range(0,4):
 
                    # skeleton_poses=skeleton_poses[:-3]
                    # pose_bins=pose_bins[:-3]
+
+                    if len(pose_bins)>0:
+                        while len(to_nao) < pose_bins[-1] + delay+1:
+                            pose_bins.pop()
+                            if len(pose_bins)==0:
+                                break
+
+                    to_nao = to_nao[[x+delay for x in pose_bins],:]
 
                     robot_poses = robot_angles[[x+delay for x in pose_bins],:]
 
@@ -115,8 +130,10 @@ for delay in range(0,4):
                     poses[subject_id][step_id][section_id] = {
                         'time': time_stamp,
                         'skeleton': skeleton_poses,
+                        'to_nao':to_nao,
                         'robot': robot_poses,
-                        'affdex':affdex
+                        'affdex':affdex,
+                        'task':data[subject_id][step_id][section_id]['task']
                     }
 
 
