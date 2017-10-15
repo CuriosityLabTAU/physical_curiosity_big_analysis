@@ -31,8 +31,8 @@ for f in files:
     subject_id = float(info[4])
     print subject_id
 
-    if subject_id!=54.0:
-        continue
+    # if subject_id!=54.0:
+    #     continue
 
     if subject_id > 0.0:
         print('processing ', subject_id)
