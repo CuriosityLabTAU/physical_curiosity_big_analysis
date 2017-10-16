@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from external_files.angle_matrix import AngleMatrix
 from numpy.linalg import inv,pinv
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.style.use('ggplot')
 
 sections_list=['learn', 'task1', 'task2', 'task3']
 poses = pickle.load(open('data_of_poses_21', 'rb'))
@@ -106,36 +109,37 @@ parameter_c={}
 def func(x, a, b, c):
     return a * np.exp(-b * x) + c
 
-for subject_id,step in matrix_error.items():
-    last_matrix_error[subject_id] = {}
-    parameter_a[subject_id] = {}
-    parameter_b[subject_id] = {}
-    parameter_c[subject_id] = {}
-
-    for step_id, errors  in step.items():
-        if len(errors) > 2 ###### :
-            last_matrix_error[subject_id][step_id] = errors[-1]
-
-            popt, pcov = curve_fit(func, [i for i in range(len(errors))], errors, maxfev = 30000)
-
-            parameter_a[subject_id][step_id] = popt[0]
-            parameter_b[subject_id][step_id] = popt[1]
-            parameter_c[subject_id][step_id] = popt[2]
-
-last_matrix_error_df=pd.DataFrame.from_dict(last_matrix_error, orient='index')
-parameter_a_df=pd.DataFrame.from_dict(parameter_a, orient='index')
-parameter_b_df=pd.DataFrame.from_dict(parameter_b, orient='index')
-parameter_c_df=pd.DataFrame.from_dict(parameter_c, orient='index')
-
-print last_matrix_error_df
-print parameter_a_df
-print parameter_b_df
-print parameter_c_df
+# for subject_id,step in matrix_error.items():
+#     last_matrix_error[subject_id] = {}
+#     parameter_a[subject_id] = {}
+#     parameter_b[subject_id] = {}
+#     parameter_c[subject_id] = {}
+#
+#     for step_id, errors  in step.items():
+#         if len(errors) > 2: ######
+#             last_matrix_error[subject_id][step_id] = errors[-1]
+#
+#             popt, pcov = curve_fit(func, [i for i in range(len(errors))], errors, maxfev = 30000)
+#
+#             parameter_a[subject_id][step_id] = popt[0]
+#             parameter_b[subject_id][step_id] = popt[1]
+#             parameter_c[subject_id][step_id] = popt[2]
+#
+# last_matrix_error_df=pd.DataFrame.from_dict(last_matrix_error, orient='index')
+# parameter_a_df=pd.DataFrame.from_dict(parameter_a, orient='index')
+# parameter_b_df=pd.DataFrame.from_dict(parameter_b, orient='index')
+# parameter_c_df=pd.DataFrame.from_dict(parameter_c, orient='index')
+#
+# print last_matrix_error_df
+# print parameter_a_df
+# print parameter_b_df
+# print parameter_c_df
 
 
 
 ##Get task error (error = pose - task_pose):
 task_error = {}
+tasks_min_pass_attribute=5
 for subject_id, step in poses.items():
 
     task_error[subject_id] = {}
@@ -155,12 +159,6 @@ for subject_id, step in poses.items():
                 for i, d in enumerate(section['time']):
                     pose = section['skeleton'][i]
 
-
-###
-                    if section['task'] not in ['two_hands_forward','two_hands_down','two_hands_to_the_side']:
-                        print section['task']
-                        continue
-###
 
                     error=0
                     task_pose_original=0
@@ -204,33 +202,68 @@ for subject_id, step in poses.items():
                         task_pose_original = np.dot(np.array([1.25, 0.00, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
-
-
                     elif section['task'] == 'right_hand_to_the_side_left_hand_forward':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([0.00, 0.00, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_down_left_hand_to_the_side':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([1.45, 1.30, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_down_left_hand_forward':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([0.00, 0.00, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_down':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([-1.25, 0.0, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_forward':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([-1.25, 0.0, 0.00, -0.034, 0.00, 0.00, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_to_the_side':
-                        task_pose_original = np.dot(np.array([1.45, 1.00, 0.00, -0.034, 1.45, -1.00, 0.00, 0.034]),pinv(matrix))
+                        task_pose_original = np.dot(np.array([-1.25, 0.0, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]),pinv(matrix))
                         error = (pose - task_pose_original)
 
+                    if section['task']==0:
+                        continue
 
+                    agg_error=np.rad2deg((np.linalg.norm(error[(0,1,4,5),]))/4)
 
-                    agg_error=np.rad2deg(np.linalg.norm(error[(0,1,4,5),])/8)
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
+                    task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])
+
+#build pass task DF:
+task_results={}
+for subject_id, step in task_error.items():
+
+    task_results[subject_id] = {}
+
+    for step_id, step in step.items():
+
+        task_results[subject_id][step_id] = 0
+
+        step_results=[]
+
+        for section_id in step.keys():
+            if 'min_error' in task_error[subject_id][step_id][section_id].keys():
+
+                if task_error[subject_id][step_id][section_id]['min_error'] <= tasks_min_pass_attribute:
+
+                    step_results.append(1)
+                else:
+                    step_results.append(0)
+        if len(section_id)>0:
+            task_results[subject_id][step_id]=np.mean(step_results)
+
+
+task_results_df=pd.DataFrame.from_dict(task_results, orient='index')
+
+print task_results_df
+
+df=task_results_df.transpose()
+
+plt.figure()
+df.plot()
+plt.show()
