@@ -31,9 +31,6 @@ for f in files:
     subject_id = float(info[4])
     print subject_id
 
-    # if subject_id!=54.0:
-    #     continue
-
     if subject_id > 0.0:
         print('processing ', subject_id)
         count+=1
@@ -111,8 +108,6 @@ for f in files:
                   # parse the time to sections (learning, task1, task2, task3)
                 if 'start' in msg.data:
                     if step in data[subject_id]:
-                        # print subject_id,step,sections[section_id]
-                        # print task,t
                         is_working=True
                         data[subject_id][step][sections[section_id]] = {
                             'start': t,
@@ -181,6 +176,7 @@ for f in files:
             if 'skeleton_angle' in topic:
                 #       get raw skeleton markers
                 current_skeleton_angle = msg.data
+                # print current_skeleton_angle
 
                     #dict[id] = dict[section] = array(dict{skeleton, robot, time})
                 if is_working==True:
@@ -207,6 +203,6 @@ for f in files:
 print(data.keys())
 print 'subjects_with_no_angles_topic: ',subjects_with_no_angles_topic
 
-pickle.dump(obj=data, file=open('raw_data_all', 'wb'))
+pickle.dump(obj=data, file=open('raw_data_all_2', 'wb'))
 
 

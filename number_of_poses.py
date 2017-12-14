@@ -15,6 +15,8 @@ matplotlib.style.use('ggplot')
 sections_list=['learn', 'task1', 'task2', 'task3']
 poses = pickle.load(open('data_of_poses_21', 'rb'))
 
+# poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
+
 
 #Number of poses for subjects:
 

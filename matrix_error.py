@@ -14,6 +14,9 @@ matplotlib.style.use('ggplot')
 
 poses = pickle.load(open('data_of_poses_21', 'rb'))
 
+# poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
+
+
 # createing matrix error:
 
 matrix_error = {}
