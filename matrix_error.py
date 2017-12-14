@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.style.use('ggplot')
 
-poses = pickle.load(open('data_of_poses_21', 'rb'))
+# poses = pickle.load(open('data/data_of_poses_21', 'rb'))
 
-# poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
+poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
 
 # createing matrix error:
@@ -40,8 +40,6 @@ for subject_id, step in poses.items():
                 robot_vectors =np.empty((0,8))
 
                 for i, d in enumerate(section['time']):
-
-
                     skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i]))
                     robot_vectors=np.vstack((robot_vectors, section['robot'][i]))
 
@@ -53,7 +51,7 @@ for subject_id, step in poses.items():
                         difference=difference[(0,1,4,5),]
                         difference=difference[:,(0,1,4,5)]
 
-                        error= np.linalg.norm(difference)/4
+                        error= np.linalg.norm(difference)/16
 
                         # matrix_error[subject_id][step_id][i+1] = np.rad2deg(error)
 
@@ -104,3 +102,10 @@ def func(x, a, b, c):
 
 
 #todo: make is simpol from the start - 4*4 - will find the problom!
+
+
+for subject_id, matrix_step in matrix_error.items():
+    for step_id, matrix_pose in matrix_step.items():
+        plt.plot(matrix_pose)
+        plt.title(str(subject_id) + ',' + str(step_id))
+        plt.show()

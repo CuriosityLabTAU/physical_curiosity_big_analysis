@@ -1,8 +1,13 @@
-import rospy
-from std_msgs.msg import String
 import numpy as np
 import random
 import copy
+
+ANALYSIS = True
+
+if not ANALYSIS:
+    import rospy
+    from std_msgs.msg import String
+
 
 class AngleMatrix:
 
@@ -70,10 +75,13 @@ class AngleMatrix:
 
     def start(self):
         #init a listener to kinect angles
-        rospy.init_node('angle_matrix')
-        rospy.Subscriber("skeleton_angles", String, self.callback)
-        rospy.Subscriber("the_flow", String, self.flow_handling)
-        rospy.spin()
+        if not ANALYSIS:
+            rospy.init_node('angle_matrix')
+            rospy.Subscriber("skeleton_angles", String, self.callback)
+            rospy.Subscriber("the_flow", String, self.flow_handling)
+            rospy.spin()
+        else:
+            pass
 
     def flow_handling(self, data):
         if 'stop' in data.data:
