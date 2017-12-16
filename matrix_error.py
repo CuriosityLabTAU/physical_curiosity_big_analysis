@@ -28,7 +28,10 @@ for subject_id, step in poses.items():
 
         matrix=poses[subject_id][step_id]['matrix']
 
-        matrix_error[subject_id][step_id] = []
+        matrix_error[subject_id][step_id] = {}
+        matrix_error[subject_id][step_id]['error']=[]
+        matrix_error[subject_id][step_id]['matrix']=[]
+
 
         for section_id in step.keys():
 
@@ -55,13 +58,22 @@ for subject_id, step in poses.items():
 
                         # matrix_error[subject_id][step_id][i+1] = np.rad2deg(error)
 
-                        matrix_error[subject_id][step_id].append(error)
+                        matrix_error[subject_id][step_id]['matrix'].append(Amat)
+                        matrix_error[subject_id][step_id]['error'].append(error)
+
+                argmin_for_best_error=np.argmin(matrix_error[subject_id][step_id]['error'])
+                matrix_error[subject_id][step_id]['min_error']=matrix_error[subject_id][step_id]['error'][argmin_for_best_error]
+                matrix_error[subject_id][step_id]['best_matrix']=matrix_error[subject_id][step_id]['matrix'][argmin_for_best_error]
 
 
-last_matrix_error={}
-parameter_a={}
-parameter_b={}
-parameter_c={}
+
+
+
+
+# last_matrix_error={}
+# parameter_a={}
+# parameter_b={}
+# parameter_c={}
 
 
 # sns.set(color_codes=True)
@@ -71,8 +83,8 @@ parameter_c={}
 # plt.show()
 
 #statistical results - histogram of matrix_error across subjects:
-def func(x, a, b, c):
-    return a * np.exp(-b * x) + c
+# def func(x, a, b, c):
+#     return a * np.exp(-b * x) + c
 
 # for subject_id,step in matrix_error.items():
 #     last_matrix_error[subject_id] = {}
@@ -101,11 +113,11 @@ def func(x, a, b, c):
 # print parameter_c_df
 
 
-#todo: make is simpol from the start - 4*4 - will find the problom!
+#make is simpol from the start - 4*4 - will find the problom!
 
-
-for subject_id, matrix_step in matrix_error.items():
-    for step_id, matrix_pose in matrix_step.items():
-        plt.plot(matrix_pose)
-        plt.title(str(subject_id) + ',' + str(step_id))
-        plt.show()
+#
+# for subject_id, matrix_step in matrix_error.items():
+#     for step_id, matrix_pose in matrix_step.items():
+#         plt.plot(matrix_pose)
+#         plt.title(str(subject_id) + ',' + str(step_id))
+#         plt.show()

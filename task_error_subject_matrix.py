@@ -15,6 +15,8 @@ matplotlib.style.use('ggplot')
 sections_list=['learn', 'task1', 'task2', 'task3']
 poses = pickle.load(open('data_of_poses_21', 'rb'))
 
+
+
 # poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
 
 
@@ -39,7 +41,6 @@ for subject_id, step in poses.items():
 
                 for i, d in enumerate(section['time']):
                     pose = section['skeleton'][i]
-
 
                     error=0
                     task_pose_original=0
@@ -114,51 +115,3 @@ for subject_id, step in poses.items():
 
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
                     task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])
-
-#build pass task DF:
-task_results={}
-for subject_id, step in task_error.items():
-
-    task_results[subject_id] = {}
-
-    for step_id, step in step.items():
-
-        task_results[subject_id][step_id] = 0
-
-        step_results=[]
-
-        for section_id in step.keys():
-            if 'min_error' in task_error[subject_id][step_id][section_id].keys():
-
-                if task_error[subject_id][step_id][section_id]['min_error'] <= pass_threshold:
-
-                    step_results.append(1)
-                else:
-                    step_results.append(0)
-
-        if len(section_id)>0:
-            task_results[subject_id][step_id]=np.mean(step_results)
-
-
-task_results_df=pd.DataFrame.from_dict(task_results, orient='index')
-
-print list(task_results_df)
-
-df=task_results_df
-
-
-
-df.drop(df.columns[[0, 9]], axis=1, inplace=True)  # df.columns is zero-based pd.Index
-print df
-
-df=df.transpose()
-
-mean= df.mean(axis=1)
-print mean
-
-plt.figure()
-mean.plot()
-plt.show()
-
-
-#todo : try to find a best threshold for the tasks (mot 10-20 for all)

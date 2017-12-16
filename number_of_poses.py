@@ -11,11 +11,13 @@ from numpy.linalg import inv,pinv
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.style.use('ggplot')
+from sklearn import linear_model
+
 
 sections_list=['learn', 'task1', 'task2', 'task3']
-poses = pickle.load(open('data_of_poses_21', 'rb'))
+# poses = pickle.load(open('data_of_poses_21', 'rb')) #for lab computer
 
-# poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
+poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
 
 
 #Number of poses for subjects:
@@ -44,6 +46,9 @@ for subject_id, step in poses.items():
 
 subject_number_of_poses_df=pd.DataFrame.from_dict(subject_number_of_poses, orient='index')
 
+subject_number_of_poses_df.drop(subject_number_of_poses_df.columns[[1]], axis=1, inplace=True)  #delete the second epoch(no learning)
+
+
 median= subject_number_of_poses_df.median(numeric_only=True, axis=1)
 average = subject_number_of_poses_df.mean(numeric_only=True, axis=1)
 
@@ -51,5 +56,18 @@ subject_number_of_poses_df['median'] =median
 subject_number_of_poses_df['average']=average
 
 print subject_number_of_poses_df
+
+
+#Linear Regression
+def linear_regression(x,y):
+    linear_model.LinearRegression().fit(x,y)
+
+x=[]
+
+
+
+# def linear_regression(x,y):
+
+
 
 #Todo: linear regretion

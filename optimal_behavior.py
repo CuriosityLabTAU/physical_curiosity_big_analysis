@@ -47,6 +47,10 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     # given skeleton vectors, calculate the true robot vectors from the true real matrix
     # optimally calculate the matrix from the skeleton vectors and true robot vectors
     # return the error
+
+    for i in new_skeleton_vector:
+        if i < -np.pi or i > np.pi:
+            return np.inf
     skeleton_full = [new_skeleton_vector[0], new_skeleton_vector[1], 0, 0,
                      new_skeleton_vector[2], new_skeleton_vector[3], 0, 0]
 
@@ -73,17 +77,25 @@ def find_optimal_pose(_true_matrix):
 
     return poses_list, errors
 
+# m='Nelder-Mead' - ok
+m='Powell' # - dosent keep bounds  (but good)
+# m='SLSQP' # - not good !
+# m='TNC' - not good !
+# m='L-BFGS-B' - not good!
 
 def find_local_optimal_pose(poses_list_previous, _true_matrix):
-    x0 = np.random.randn(4, 1) * np.pi / 6
+    # x0 = np.random.randn(4, 1) * np.pi / 6
+    # x0 = [np.pi / 6, np.pi / 6 ,np.pi / 6,np.pi / 6]
+    x0 = [0,0,0,0]
     optimal_pose = scipy.optimize.minimize(fun=calc_matrix_error, x0=x0,
                                            args=(poses_list_previous, _true_matrix),
                                            bounds=[(-np.pi, np.pi), (-np.pi, np.pi), (-np.pi, np.pi),
                                                    (-np.pi, np.pi)],
-                                           tol=1e-6)
+                                           tol=1e-6,method=m)
     new_pose = [optimal_pose.x[0], optimal_pose.x[1], 0, 0,
                 optimal_pose.x[2], optimal_pose.x[3], 0, 0]
     error = optimal_pose.fun
+    print
     return new_pose, error
 
 
@@ -102,7 +114,7 @@ for subject_id, step in poses.items():
         poses_list_optimal, errors_optimal = find_optimal_pose(matrix)
 
         optimal_pose_error[subject_id][step_id] = errors_optimal
-        local_optimal_pose[subject_id][step_id] = errors_optimal
+        local_optimal_pose[subject_id][step_id] = []
 
         for section_id in step.keys():
 
@@ -119,13 +131,12 @@ for subject_id, step in poses.items():
 
                     _, locel_error = find_local_optimal_pose(skeleton_vectors, matrix)
 
-                    if i > 3:
+                    print subject_id,step_id,i
 
-                        pinv_skeleton = np.linalg.pinv(skeleton_vectors)
-                        Amat = np.dot(pinv_skeleton, robot_vectors)
+                    local_optimal_pose[subject_id][step_id].append(locel_error)
 
-                        difference=matrix - Amat
-                        difference=difference[(0,1,4,5),]
-                        difference=difference[:,(0,1,4,5)]
-
-                        error= np.linalg.norm(difference)/16
+for subject_id, matrix_step in optimal_pose_error.items():
+    for step_id, matrix_pose in matrix_step.items():
+        plt.plot(matrix_pose)
+        plt.title(str(subject_id) + ',' + str(step_id))
+        plt.show()
