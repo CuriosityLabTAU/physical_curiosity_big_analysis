@@ -14,9 +14,9 @@ matplotlib.style.use('ggplot')
 import scipy.optimize
 
 
-# poses = pickle.load(open('data/data_of_poses_21', 'rb'))
+poses = pickle.load(open('data/data_of_poses_21', 'rb'))
 
-poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
+# poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
 
 def get_all_poses():
@@ -127,7 +127,6 @@ for subject_id, step in poses.items():
 
                 for i, d in enumerate(section['time']):
                     skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i]))
-                    robot_vectors=np.vstack((robot_vectors, section['robot'][i]))
 
                     _, locel_error = find_local_optimal_pose(skeleton_vectors, matrix)
 
@@ -135,8 +134,14 @@ for subject_id, step in poses.items():
 
                     local_optimal_pose[subject_id][step_id].append(locel_error)
 
-for subject_id, matrix_step in optimal_pose_error.items():
-    for step_id, matrix_pose in matrix_step.items():
-        plt.plot(matrix_pose)
-        plt.title(str(subject_id) + ',' + str(step_id))
-        plt.show()
+pickle.dump(obj=optimal_pose_error, file=open('data/optimal_pose_error', 'wb'))
+pickle.dump(obj=local_optimal_pose, file=open('data/local_optimal_pose', 'wb'))
+
+
+
+                    #
+# for subject_id, matrix_step in local_optimal_pose.items():
+#     for step_id, matrix_pose in matrix_step.items():
+#         plt.plot(matrix_pose)
+#         plt.title(str(subject_id) + ',' + str(step_id))
+#         plt.show()

@@ -13,11 +13,13 @@ import matplotlib
 matplotlib.style.use('ggplot')
 
 sections_list=['learn', 'task1', 'task2', 'task3']
-poses = pickle.load(open('data_of_poses_21', 'rb'))
 
+#loae data:
+poses = pickle.load(open('data/data_of_poses_21', 'rb'))
+matrix_error_data=pickle.load(open('data/matrix_error_data', 'rb'))
 
-
-# poses = pickle.load(open('data_of_poses_21', 'r')) #for home computer
+# poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
+# matrix_error_data=pickle.load(open('data/matrix_error_data', 'r')) #for home computer
 
 
 ##Get task error (error = pose - task_pose):
@@ -29,7 +31,17 @@ for subject_id, step in poses.items():
 
     for step_id, step in step.items():
 
-        matrix=poses[subject_id][step_id]['matrix']
+        if step_id==0:
+            continue
+
+        if step_id == 1:
+            matrix = matrix_error_data[subject_id][0]['best_matrix']
+        else:
+            matrix=matrix_error_data[subject_id][step_id]['best_matrix']
+
+        if matrix is None:
+            task_error[subject_id][step_id]=None
+            continue
 
         task_error[subject_id][step_id] = {}
 
@@ -115,3 +127,56 @@ for subject_id, step in poses.items():
 
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
                     task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])
+
+pickle.dump(obj=task_error, file=open('data/tasks_error_real_matrix', 'wb'))
+
+
+
+
+# #build pass task DF:
+# task_results={}
+# for subject_id, step in task_error.items():
+#
+#     task_results[subject_id] = {}
+#
+#     for step_id, step in step.items():
+#
+#         task_results[subject_id][step_id] = 0
+#
+#         step_results=[]
+#
+#         print subject_id,step_id
+#
+#         if task_error[subject_id][step_id] is not None:
+#             for section_id in step.keys():
+#                 if 'min_error' in task_error[subject_id][step_id][section_id].keys():
+#
+#                     if task_error[subject_id][step_id][section_id]['min_error'] <= pass_threshold:
+#
+#                         step_results.append(1)
+#                     else:
+#                         step_results.append(0)
+#
+#             if len(section_id)>0:
+#                 task_results[subject_id][step_id]=np.mean(step_results)
+#
+#
+# task_results_df=pd.DataFrame.from_dict(task_results, orient='index')
+#
+# print list(task_results_df)
+#
+# df=task_results_df
+#
+#
+#
+# df.drop(df.columns[[0, 8]], axis=1, inplace=True)  # df.columns is zero-based pd.Index
+# print df
+#
+# df=df.transpose()
+#
+# mean= df.mean(axis=1)
+# print mean
+#
+# plt.figure()
+# mean.plot()
+# plt.show()
