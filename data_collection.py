@@ -160,11 +160,8 @@ for subject_id, step in tasks_error_real_matrix.items():
 
             if 'min_error' in tasks_error_real_matrix[subject_id][step_id][section_id].keys():
 
-                if tasks_error_real_matrix[subject_id][step_id][section_id]['min_error'] <= pass_threshold:
+                step_results.append(tasks_error_real_matrix[subject_id][step_id][section_id]['min_error'])
 
-                    step_results.append(1)
-                else:
-                    step_results.append(0)
 
 
         if len(step_results)>0:
@@ -223,11 +220,8 @@ for subject_id, step in tasks_error_subject_matrix.items():
 
                 if 'min_error' in tasks_error_subject_matrix[subject_id][step_id][section_id].keys():
 
-                    if tasks_error_subject_matrix[subject_id][step_id][section_id]['min_error'] <= pass_threshold:
+                    step_results.append(tasks_error_subject_matrix[subject_id][step_id][section_id]['min_error'])
 
-                        step_results.append(1)
-                    else:
-                        step_results.append(0)
 
 
         if len(step_results)>0:
@@ -261,14 +255,14 @@ section_1_df = pd.concat([section_1_df, section_1_task_error_subject_matrix_resu
 other_sections_df = pd.concat([other_sections_df, other_sections_task_error_subject_matrix_results_df], axis=1)
 
 
-##export to excel
-# Create a Pandas Excel writer using XlsxWriter as the engine.
-writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
-
-# Write each dataframe to a different worksheet.
-section_0_df.w3wsto_excel(writer, sheet_name='section_0')
-section_1_df.to_excel(writer, sheet_name='section_1')
-other_sections_df.to_excel(writer, sheet_name='other_sections')
-
-# Close the Pandas Excel writer and output the Excel file.
-writer.save()
+# ##export to excel
+# # Create a Pandas Excel writer using XlsxWriter as the engine.
+# writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
+#
+# # Write each dataframe to a different worksheet.
+# section_0_df.to_excel(writer, sheet_name='section_0')
+# section_1_df.to_excel(writer, sheet_name='section_1')
+# other_sections_df.to_excel(writer, sheet_name='other_sections')
+#
+# # Close the Pandas Excel writer and output the Excel file.
+# writer.save()
