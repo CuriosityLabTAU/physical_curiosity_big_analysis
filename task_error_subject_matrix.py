@@ -128,7 +128,7 @@ for subject_id, step in poses.items():
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
                     task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])
 
-pickle.dump(obj=task_error, file=open('data/tasks_error_real_matrix', 'wb'))
+pickle.dump(obj=task_error, file=open('data/tasks_error_subject_matrix', 'wb'))
 
 
 

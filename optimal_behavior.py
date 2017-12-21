@@ -51,6 +51,7 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     for i in new_skeleton_vector:
         if i < -np.pi or i > np.pi:
             return np.inf
+
     skeleton_full = [new_skeleton_vector[0], new_skeleton_vector[1], 0, 0,
                      new_skeleton_vector[2], new_skeleton_vector[3], 0, 0]
 
