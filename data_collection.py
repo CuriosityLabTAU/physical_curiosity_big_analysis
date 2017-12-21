@@ -266,7 +266,7 @@ other_sections_df = pd.concat([other_sections_df, other_sections_task_error_subj
 writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
 
 # Write each dataframe to a different worksheet.
-section_0_df.to_excel(writer, sheet_name='section_0')
+section_0_df.w3wsto_excel(writer, sheet_name='section_0')
 section_1_df.to_excel(writer, sheet_name='section_1')
 other_sections_df.to_excel(writer, sheet_name='other_sections')
 
