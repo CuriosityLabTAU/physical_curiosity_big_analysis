@@ -14,10 +14,9 @@ matplotlib.style.use('ggplot')
 from sklearn import datasets, linear_model
 
 # linear regression fun:
-def linear_regression_from_df(data,m_name,c_name):
+def linear_regression_from_df(data,m_name):
     subjects=[]
     m_list=[]
-    c_list=[]
     for row in data.iterrows():
         y = row[1].values.tolist()
         len_x = len(y)
@@ -29,20 +28,20 @@ def linear_regression_from_df(data,m_name,c_name):
         y=y[not_none_index]
         x=x[not_none_index]
 
-        #creat A:
-        A = np.vstack([x, np.ones(len(x))]).T
+        #start from 0:
+        y=y-y[0]
+
+        # crate x for a non intercepted linear regressio
+        x = x[:, np.newaxis]
 
         #run linear regression
-        m, c = np.linalg.lstsq(A, y)[0]
+        m, _, _, _ = np.linalg.lstsq(x, y)
         m_list.append(m)
-        c_list.append(c)
         subjects.append(row[0])
 
-    df = pd.DataFrame(np.column_stack([m_list, c_list]),columns=[m_name, c_name],index=subjects)
+    df = pd.DataFrame(np.column_stack([m_list]),columns=[m_name],index=subjects)
     df.columns.names = ['subject_id']
     return df
-
-
 
 
 ##we will crate a DF with all the data:
@@ -53,7 +52,7 @@ def linear_regression_from_df(data,m_name,c_name):
 
 ## Number of poses
 #lode data
-subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'rb'))
+subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'r'))
 
 #crate df:
 subject_number_of_poses_df=pd.DataFrame.from_dict(subject_number_of_poses, orient='index')
@@ -72,12 +71,12 @@ section_1_df.columns=['subject_number_of_poses']
 
 #all other sections df
 other_sections_data= pd.DataFrame(subject_number_of_poses_df.iloc[:,2:])
-other_sections_df=linear_regression_from_df(other_sections_data,'m_number_of_poses','c_number_of_poses')
+other_sections_df=linear_regression_from_df(other_sections_data,'m_number_of_poses')
 
 
 ##Matrix error:
 #lode data
-matrix_error = pickle.load(open('data/matrix_error_data', 'rb'))
+matrix_error = pickle.load(open('data/matrix_error_data', 'r'))
 
 #crate df:
 min_dict={}
@@ -127,10 +126,10 @@ section_1_mean_matrix_df.columns=['mean_matrix_error']
 
 #all other sections:
 other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:])
-other_sections_min_matrix_df=linear_regression_from_df(other_sections_min_matrix_data,'m_min_matrix_error','c_min_matrix_error')
+other_sections_min_matrix_df=linear_regression_from_df(other_sections_min_matrix_data,'m_min_matrix_error')
 
 other_sections_mean_matrix_data= pd.DataFrame(mean_matrix_error.iloc[:,2:])
-other_sections_mean_matrix_df=linear_regression_from_df(other_sections_mean_matrix_data,'m_mean_matrix_error','c_mean_matrix_error')
+other_sections_mean_matrix_df=linear_regression_from_df(other_sections_mean_matrix_data,'m_mean_matrix_error')
 
 #conect to df:
 section_0_df = pd.concat([section_0_df, section_0_min_matrix_df,section_0_mean_matrix_df], axis=1)
@@ -140,7 +139,7 @@ other_sections_df = pd.concat([other_sections_df, other_sections_min_matrix_df,o
 
 ##Task error - real matrix:
 #lode data
-tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'rb'))
+tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'r'))
 
 #crate df:
 pass_threshold=20
@@ -186,7 +185,7 @@ section_1_task_error_real_matrix_results_df.columns=['task_error_real_matrix_res
 
 #all other sections:
 other_sections_task_error_real_matrix_results_data= pd.DataFrame(task_error_real_matrix_results_df.iloc[:,2:])
-other_sections_task_error_real_matrix_results_df=linear_regression_from_df(other_sections_task_error_real_matrix_results_data,'m_task_error_real_matrix_results','c_task_error_real_matrix_results')
+other_sections_task_error_real_matrix_results_df=linear_regression_from_df(other_sections_task_error_real_matrix_results_data,'m_task_error_real_matrix_results')
 
 #conect to df:
 section_0_df = pd.concat([section_0_df, section_0_task_error_real_matrix_results_df], axis=1)
@@ -196,7 +195,7 @@ other_sections_df = pd.concat([other_sections_df, other_sections_task_error_real
 
 ##Task error - subject matrix:
 #lode data
-tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'rb'))
+tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'r'))
 
 #crate df:
 pass_threshold=20
@@ -247,22 +246,21 @@ section_1_task_error_subject_matrix_results_df.columns=['task_error_subject_matr
 
 #all other sections:
 other_sections_task_error_subject_matrix_results_data= pd.DataFrame(task_error_subject_matrix_results_df.iloc[:,2:])
-other_sections_task_error_subject_matrix_results_df=linear_regression_from_df(other_sections_task_error_subject_matrix_results_data,'m_task_error_subject_matrix_results','c_task_error_subject_matrix_results')
+other_sections_task_error_subject_matrix_results_df=linear_regression_from_df(other_sections_task_error_subject_matrix_results_data,'m_task_error_subject_matrix_results')
 
 #conect to df:
 section_0_df = pd.concat([section_0_df, section_0_task_error_subject_matrix_results_df], axis=1)
 section_1_df = pd.concat([section_1_df, section_1_task_error_subject_matrix_results_df], axis=1)
 other_sections_df = pd.concat([other_sections_df, other_sections_task_error_subject_matrix_results_df], axis=1)
 
+##export to excel
+# Create a Pandas Excel writer using XlsxWriter as the engine.
+writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
 
-# ##export to excel
-# # Create a Pandas Excel writer using XlsxWriter as the engine.
-# writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
-#
-# # Write each dataframe to a different worksheet.
-# section_0_df.to_excel(writer, sheet_name='section_0')
-# section_1_df.to_excel(writer, sheet_name='section_1')
-# other_sections_df.to_excel(writer, sheet_name='other_sections')
-#
-# # Close the Pandas Excel writer and output the Excel file.
-# writer.save()
+# Write each dataframe to a different worksheet.
+section_0_df.to_excel(writer, sheet_name='section_0')
+section_1_df.to_excel(writer, sheet_name='section_1')
+other_sections_df.to_excel(writer, sheet_name='other_sections')
+
+# Close the Pandas Excel writer and output the Excel file.
+writer.save()
