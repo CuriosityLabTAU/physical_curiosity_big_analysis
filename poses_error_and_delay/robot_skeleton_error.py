@@ -11,7 +11,7 @@ sections_list=['learn', 'task1', 'task2', 'task3']
 
 #Find time interval:
 intraval_time=[]
-data = pickle.load(open('raw_data_all', 'rb'))
+data = pickle.load(open('/home/matan/PycharmProjects/physical_curiosity_big_analysis/data/raw_data_all_merged', 'rb'))
 
 for subject_id, step in data.items():
 
@@ -37,7 +37,7 @@ intraval_time = round(np.median(intraval_time),2)
 avg_error_per_delays=[]
 for delay in range(0,50):
 
-    poses = pickle.load(open('data_of_poses_'+str(delay), 'rb'))
+    poses = pickle.load(open('/home/matan/PycharmProjects/physical_curiosity_big_analysis/data/data_of_poses_'+str(delay), 'rb'))
 
     skeleton_metrix_robot_error={}
     for subject_id, step in poses.items():
