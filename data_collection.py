@@ -18,16 +18,17 @@ def linear_regression_from_df(data,m_name):
     subjects=[]
     m_list=[]
     for row in data.iterrows():
+
         y = row[1].values.tolist()
         len_x = len(y)
         y = np.array(y)
         x = [i for i in range(len_x)]
         x = np.array(x)
-        #take out nones:
-        not_none_index=np.nonzero(y)
-        y=y[not_none_index]
-        x=x[not_none_index]
 
+        #take out nones:
+        none_index=np.argwhere(np.isnan(y))
+        y=np.delete(y, none_index, 0)
+        x=np.delete(x, none_index, 0)
         #start from 0:
         y=y-y[0]
 
@@ -231,7 +232,6 @@ for subject_id, step in tasks_error_subject_matrix.items():
 
 task_error_subject_matrix_results_df=pd.DataFrame.from_dict(task_error_subject_matrix_results, orient='index')
 task_error_subject_matrix_results_df.drop(task_error_subject_matrix_results_df.columns[[8]], axis=1, inplace=True)
-
 
 
 #section 0:
