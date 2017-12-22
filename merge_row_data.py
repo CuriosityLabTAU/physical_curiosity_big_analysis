@@ -3,8 +3,8 @@ import pickle
 
 
 
-data1 = pickle.load(open('raw_data_all', 'rb'))
-data2 = pickle.load(open('raw_data_all_3', 'rb'))
+data1 = pickle.load(open('data/raw_data_all', 'rb'))
+data2 = pickle.load(open('data/raw_data_all_5', 'rb'))
 
 subject_id_data1 = []
 subject_id_data2 = []
