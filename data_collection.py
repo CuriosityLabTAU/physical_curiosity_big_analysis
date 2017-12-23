@@ -90,7 +90,7 @@ for subject_id,step in matrix_error.items():
         if 'error' in errors.keys():
             if len(errors['error'])>0:
                 min_error=min(errors['error'])
-                mean_error=np.mean(errors['error'])
+                mean_error=np.nanmean(errors['error'])
                 min_dict[subject_id][step_id] = min_error
                 mean_dict[subject_id][step_id] = mean_error
             else:
@@ -165,7 +165,7 @@ for subject_id, step in tasks_error_real_matrix.items():
 
 
         if len(step_results)>0:
-            task_error_real_matrix_results[subject_id][step_id]=np.mean(step_results)
+            task_error_real_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
             task_error_real_matrix_results[subject_id][step_id]=None
@@ -225,7 +225,7 @@ for subject_id, step in tasks_error_subject_matrix.items():
 
 
         if len(step_results)>0:
-            task_error_subject_matrix_results[subject_id][step_id]=np.mean(step_results)
+            task_error_subject_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
             task_error_subject_matrix_results[subject_id][step_id]=None
