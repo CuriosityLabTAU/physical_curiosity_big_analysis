@@ -61,7 +61,10 @@ for delay in range(0,50):
 
     for subject_id, step in data.items():           # go over subject
 
-        if subject_id==63.0 or subject_id==67.0 or subject_id==53.0:
+        # if subject_id==63.0 or subject_id==67.0 or subject_id==53.0:
+        #     continue
+
+        if subject_id==1.0 or subject_id==51.0:
             continue
 
         poses[subject_id] = {}

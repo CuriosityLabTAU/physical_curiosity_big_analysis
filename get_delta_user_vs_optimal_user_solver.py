@@ -45,73 +45,59 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     return error
 
 
-def find_optimal_pose(_poses_list ,_true_matrix):
+def find_optimal_error_sequence(_poses_list ,_true_matrix):
     poses_list=_poses_list
     n_pos=(len(poses_list))
     best_order = np.empty((0, 8))
+    best_error_sequence=[]
+
     for t in range(n_pos):
-        optimal_pose,optimal_index=find_next_pose(best_order,poses_list,_true_matrix)
-        np.vstack((best_order, optimal_pose))
+
+        optimal_pose,optimal_index,last_error=find_next_pose(best_order,poses_list,_true_matrix)
+        best_order=np.vstack((best_order, optimal_pose))
         del poses_list[optimal_index]
-    return best_order
+        best_error_sequence.append(last_error)
+
+    return best_error_sequence
 
 
 def find_next_pose(poses_list_previous,left_poses,_true_matrix):
     errors=[]
     for i in range((len(left_poses))):
-        error=calc_matrix_error(poses_list_previous,left_poses[i],_true_matrix)
+        error=calc_matrix_error(left_poses[i],poses_list_previous,_true_matrix)
         errors.append(error)
 
     argmin=np.argmin(errors)
-    return left_poses[argmin],argmin
+
+    return left_poses[argmin],argmin , errors[argmin]
 
 
 
 # creating matrix error:
 
-delta_user_vs_optimal_user={}
+optimal_user_error={}
 for subject_id, step in poses.items():
 
-    delta_user_vs_optimal_user[subject_id] = {}
+    optimal_user_error[subject_id] = {}
 
     for step_id, step in step.items():
 
         matrix=poses[subject_id][step_id]['matrix']
 
-        delta_user_vs_optimal_user[subject_id][step_id] = []
+        optimal_user_error[subject_id][step_id] = []
 
         for section_id in step.keys():
 
             if section_id=='learn':
                 section=poses[subject_id][step_id][section_id]
 
-                # skeleton_vectors=np.empty((0,8))
-                #
-                # robot_vectors =np.empty((0,8))
-
 
                 real_poses=section['skeleton']
 
-
-
-                # for i, d in enumerate(section['time']):
-                #
-                #
-                #     skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i]))
-                #
-                #     _, locel_error = find_local_optimal_pose(skeleton_vectors, matrix)
-                #
-                #     print subject_id,step_id,i
-                #
-                #     local_optimal_pose[subject_id][step_id].append(locel_error)
-
-
-pickle.dump(obj=delta_user_vs_optimal_user, file=open('data/delta_user_vs_optimal_user', 'wb'))
+                optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses,matrix)
 
 
 
-# for subject_id, matrix_step in local_optimal_pose.items():
-#     for step_id, matrix_pose in matrix_step.items():
-#         plt.plot(matrix_pose)
-#         plt.title(str(subject_id) + ',' + str(step_id))
-#         plt.show()
+
+# pickle.dump(obj=delta_user_vs_optimal_user, file=open('data/delta_user_vs_optimal_user', 'wb'))
+

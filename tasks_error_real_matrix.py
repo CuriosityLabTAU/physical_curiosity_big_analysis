@@ -115,8 +115,6 @@ for subject_id, step in poses.items():
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
                     task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])
 
-print task_error[15.0][1]
-
 pickle.dump(obj=task_error, file=open('data/tasks_error_real_matrix', 'wb'))
 
 # #build pass task DF:

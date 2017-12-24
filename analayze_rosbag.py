@@ -203,6 +203,6 @@ for f in files:
 print(data.keys())
 print 'subjects_with_no_angles_topic: ',subjects_with_no_angles_topic
 
-pickle.dump(obj=data, file=open('raw_data_all_2', 'wb'))
+pickle.dump(obj=data, file=open('data/raw_data_all_5', 'wb'))
 
 
