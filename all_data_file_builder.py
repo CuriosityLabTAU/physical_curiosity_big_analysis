@@ -26,7 +26,7 @@ subject_number_of_poses_df.columns = ['subject_id']+[i for i in range(9)]
 keys = [i for i in range(9)]
 
 three_columns_df=pd.melt(subject_number_of_poses_df,id_vars='subject_id', value_vars=keys, value_name='number_of _poses')
-three_columns_df.columns=['subject_id','step_id','number_of _poses']
+three_columns_df.columns=['subject_id','step_id','number_of_poses']
 
 
 ##Matrix error:
