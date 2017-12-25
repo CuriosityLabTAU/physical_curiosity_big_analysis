@@ -19,16 +19,8 @@ matrix_error = pickle.load(open('data/matrix_error_data', 'rb'))
 
 # poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
-
+#todo : here - change culcolation
 def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
-    # given skeleton vectors, calculate the true robot vectors from the true real matrix
-    # optimally calculate the matrix from the skeleton vectors and true robot vectors
-    # return the error
-
-    for i in new_skeleton_vector:
-        if i < -np.pi or i > np.pi:
-            return np.inf
-
     skeleton_full = [new_skeleton_vector[0], new_skeleton_vector[1], 0, 0,
                      new_skeleton_vector[2], new_skeleton_vector[3], 0, 0]
 
@@ -47,29 +39,35 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
 
 def find_optimal_error_sequence(_real_poses_skeleton,_poses_list_robot,_true_matrix):
     real_poses_skeleton, poses_list_robot = _real_poses_skeleton,_poses_list_robot
-    n_pos=(len(poses_list))
-    best_order = np.empty((0, 8))
+    n_pos=(len(real_poses_skeleton))
+
+    best_order_skeleton = np.empty((0, 8))
+    best_order_robot = np.empty((0, 8))
+
     best_error_sequence=[]
 
     for t in range(n_pos):
 
-        optimal_pose,optimal_index,last_error=find_next_pose(best_order,poses_list,_true_matrix)
-        best_order=np.vstack((best_order, optimal_pose))
-        poses_list=np.delete(poses_list, optimal_index, 0)
+        optimal_pose_skeleton,optimal_pose_robot,optimal_index,last_error=find_next_pose(best_order_skeleton,best_order_robot,real_poses_skeleton, poses_list_robot,_true_matrix)
+        best_order_skeleton=np.vstack((best_order_skeleton, optimal_pose_skeleton))
+        best_order_robot=np.vstack((best_order_robot, optimal_pose_robot))
+        real_poses_skeleton=np.delete(real_poses_skeleton, optimal_index, 0)
+        poses_list_robot=np.delete(poses_list_robot, optimal_index, 0)
+
         best_error_sequence.append(last_error)
 
     return best_error_sequence
 
 
-def find_next_pose(poses_list_previous,left_poses,_true_matrix):
+def find_next_pose(poses_list_previous_skeleton,poses_list_previous_robot,left_poses_skeleton,left_poses_robot,_true_matrix):
     errors=[]
-    for i in range((len(left_poses))):
-        error=calc_matrix_error(left_poses[i],poses_list_previous,_true_matrix)
+    for i in range((len(left_poses_skeleton))):
+        error=calc_matrix_error(left_poses_skeleton[i],left_poses_robot[i],poses_list_previous_skeleton,poses_list_previous_robot, _true_matrix)
         errors.append(error)
 
     argmin=np.argmin(errors)
 
-    return left_poses[argmin],argmin , errors[argmin]
+    return left_poses_skeleton[argmin],poses_list_previous_robot[argmin],argmin , errors[argmin]
 
 
 
