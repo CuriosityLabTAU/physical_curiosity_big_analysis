@@ -16,7 +16,6 @@ poses = pickle.load(open('data/data_of_poses_21', 'rb'))
 
 # poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
-
 # createing matrix error:
 matrix_error = {}
 for subject_id, step in poses.items():
@@ -42,24 +41,25 @@ for subject_id, step in poses.items():
 
                 robot_vectors =np.empty((0,8))
 
+
                 for i, d in enumerate(section['time']):
                     skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i]))
                     robot_vectors=np.vstack((robot_vectors, section['robot'][i]))
 
-                    if i > 3:
-                        pinv_skeleton = np.linalg.pinv(skeleton_vectors)
-                        Amat = np.dot(pinv_skeleton, robot_vectors)
+                    # if i > 3:
+                    pinv_skeleton = np.linalg.pinv(skeleton_vectors)
+                    # Amat = np.dot(pinv_skeleton, robot_vectors)
+                    Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
-                        difference=matrix - Amat
-                        difference=difference[(0,1,4,5),]
-                        difference=difference[:,(0,1,4,5)]
 
-                        error= np.linalg.norm(difference)/16
+                    difference=matrix - Amat
+                    difference=difference[(0,1,4,5),]
+                    difference=difference[:,(0,1,4,5)]
 
-                        # matrix_error[subject_id][step_id][i+1] = np.rad2deg(error)
+                    error= np.linalg.norm(difference)/16
 
-                        matrix_error[subject_id][step_id]['matrix'].append(Amat)
-                        matrix_error[subject_id][step_id]['error'].append(error)
+                    matrix_error[subject_id][step_id]['matrix'].append(Amat)
+                    matrix_error[subject_id][step_id]['error'].append(error)
 
 
                 #NO Data in the the matrix_error[subject_id][step_id]['error']
@@ -76,17 +76,7 @@ pickle.dump(obj=matrix_error, file=open('data/matrix_error_data', 'wb'))
 
 
 
-
-
-
-
-
-
-
-
-
-
-                # last_matrix_error={}
+# last_matrix_error={}
 # parameter_a={}
 # parameter_b={}
 # parameter_c={}

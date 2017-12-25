@@ -11,7 +11,7 @@ sections_list=['learn', 'task1', 'task2', 'task3']
 
 #Find time interval:
 intraval_time=[]
-data = pickle.load(open('/home/matan/PycharmProjects/physical_curiosity_big_analysis/data/raw_data_all_merged', 'rb'))
+# data = pickle.load(open('/home/matan/PycharmProjects/physical_curiosity_big_analysis/data/raw_data_all_merged', 'rb'))
 
 for subject_id, step in data.items():
 

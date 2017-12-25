@@ -15,10 +15,10 @@ import scipy.optimize
 
 
 poses = pickle.load(open('data/data_of_poses_21', 'rb'))
+matrix_error = pickle.load(open('data/matrix_error_data', 'rb'))
 
 # poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
-# --- MATRIX: matrix * skeleton_vecotrs = robot_vectors
 
 def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     # given skeleton vectors, calculate the true robot vectors from the true real matrix
@@ -45,8 +45,8 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     return error
 
 
-def find_optimal_error_sequence(_poses_list ,_true_matrix):
-    poses_list=_poses_list
+def find_optimal_error_sequence(_real_poses_skeleton,_poses_list_robot,_true_matrix):
+    real_poses_skeleton, poses_list_robot = _real_poses_skeleton,_poses_list_robot
     n_pos=(len(poses_list))
     best_order = np.empty((0, 8))
     best_error_sequence=[]
@@ -55,7 +55,7 @@ def find_optimal_error_sequence(_poses_list ,_true_matrix):
 
         optimal_pose,optimal_index,last_error=find_next_pose(best_order,poses_list,_true_matrix)
         best_order=np.vstack((best_order, optimal_pose))
-        del poses_list[optimal_index]
+        poses_list=np.delete(poses_list, optimal_index, 0)
         best_error_sequence.append(last_error)
 
     return best_error_sequence
@@ -92,9 +92,13 @@ for subject_id, step in poses.items():
                 section=poses[subject_id][step_id][section_id]
 
 
-                real_poses=section['skeleton']
+                real_poses_skeleton = section['skeleton']
+                real_poses_robot = section['robot']
+
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses,matrix)
+
+                print 'hhh'
 
 
 

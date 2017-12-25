@@ -57,7 +57,7 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
 
     _skeleton_vectors_full = np.vstack((_skeleton_vectors, skeleton_full))
     pinv_skeleton = np.linalg.pinv(_skeleton_vectors_full)
-    true_robot_vectors = np.dot(_skeleton_vectors_full, _matrix)
+    true_robot_vectors = np.dot(_matrix,_skeleton_vectors_full)
     Amat = np.dot(pinv_skeleton, true_robot_vectors)
 
     difference = _matrix - Amat
@@ -67,7 +67,6 @@ def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
     error = np.linalg.norm(difference) / 16
     return error
 
-# MATAN:do optimization
 def find_optimal_pose(_true_matrix):
     poses_list = np.empty((0,8))
     errors = []

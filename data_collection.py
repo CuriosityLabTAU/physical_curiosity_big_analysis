@@ -63,12 +63,12 @@ subject_number_of_poses_df.drop(subject_number_of_poses_df.columns[[1]], axis=1,
 #section 0 df
 section_0_df=pd.DataFrame(subject_number_of_poses_df[0])
 section_0_df.columns.names=['subject_id']
-section_0_df.columns=['subject_number_of_poses']
+section_0_df.columns=['subject_number_of_poses_0']
 
 #section 1 df
 section_1_df=pd.DataFrame(subject_number_of_poses_df[2])
 section_1_df.columns.names=['subject_id']
-section_1_df.columns=['subject_number_of_poses']
+section_1_df.columns=['subject_number_of_poses_1']
 
 #all other sections df
 other_sections_data= pd.DataFrame(subject_number_of_poses_df.iloc[:,2:])
@@ -112,18 +112,18 @@ mean_matrix_error.columns.names=['subject_id']
 #section 0:
 section_0_min_matrix_df=pd.DataFrame(min_matrix_error[0])
 section_0_min_matrix_df.columns.names=['subject_id']
-section_0_min_matrix_df.columns=['min_matrix_error']
+section_0_min_matrix_df.columns=['min_matrix_error_0']
 section_0_mean_matrix_df=pd.DataFrame(mean_matrix_error[0])
 section_0_mean_matrix_df.columns.names=['subject_id']
-section_0_mean_matrix_df.columns=['mean_matrix_error']
+section_0_mean_matrix_df.columns=['mean_matrix_error_0']
 
 #section 1:
 section_1_min_matrix_df=pd.DataFrame(min_matrix_error[2])
 section_1_min_matrix_df.columns.names=['subject_id']
-section_1_min_matrix_df.columns=['min_matrix_error']
+section_1_min_matrix_df.columns=['min_matrix_error_1']
 section_1_mean_matrix_df=pd.DataFrame(mean_matrix_error[2])
 section_1_mean_matrix_df.columns.names=['subject_id']
-section_1_mean_matrix_df.columns=['mean_matrix_error']
+section_1_mean_matrix_df.columns=['mean_matrix_error_1']
 
 #all other sections:
 other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:])
@@ -177,12 +177,12 @@ task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns
 #section 0:
 section_0_task_error_real_matrix_results_df=pd.DataFrame(task_error_real_matrix_results_df[1])
 section_0_task_error_real_matrix_results_df.columns.names=['subject_id']
-section_0_task_error_real_matrix_results_df.columns=['task_error_real_matrix_results']
+section_0_task_error_real_matrix_results_df.columns=['task_error_real_matrix_results_0']
 
 #section 1:
 section_1_task_error_real_matrix_results_df=pd.DataFrame(task_error_real_matrix_results_df[2])
 section_1_task_error_real_matrix_results_df.columns.names=['subject_id']
-section_1_task_error_real_matrix_results_df.columns=['task_error_real_matrix_results']
+section_1_task_error_real_matrix_results_df.columns=['task_error_real_matrix_results_1']
 
 #all other sections:
 other_sections_task_error_real_matrix_results_data= pd.DataFrame(task_error_real_matrix_results_df.iloc[:,2:])
@@ -237,12 +237,12 @@ task_error_subject_matrix_results_df.drop(task_error_subject_matrix_results_df.c
 #section 0:
 section_0_task_error_subject_matrix_results_df=pd.DataFrame(task_error_subject_matrix_results_df[1])
 section_0_task_error_subject_matrix_results_df.columns.names=['subject_id']
-section_0_task_error_subject_matrix_results_df.columns=['task_error_subject_matrix_results']
+section_0_task_error_subject_matrix_results_df.columns=['task_error_subject_matrix_results_0']
 
 #section 1:
 section_1_task_error_subject_matrix_results_df=pd.DataFrame(task_error_subject_matrix_results_df[2])
 section_1_task_error_subject_matrix_results_df.columns.names=['subject_id']
-section_1_task_error_subject_matrix_results_df.columns=['task_error_subject_matrix_results']
+section_1_task_error_subject_matrix_results_df.columns=['task_error_subject_matrix_results_1']
 
 #all other sections:
 other_sections_task_error_subject_matrix_results_data= pd.DataFrame(task_error_subject_matrix_results_df.iloc[:,2:])
