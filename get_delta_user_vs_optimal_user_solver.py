@@ -96,12 +96,6 @@ for subject_id, step in poses.items():
                 real_poses_robot = section['robot']
 
                 size=min(len(real_poses_skeleton),len(real_poses_robot))
-                # if len(real_poses_robot)!=len(real_poses_skeleton):
-                #     print len(real_poses_robot),'robot'
-                #     print len(real_poses_skeleton)
-                #     delata_optimal_user_error[subject_id][step_id] = None
-                #     continue
-
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
                 delta=np.mean(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
