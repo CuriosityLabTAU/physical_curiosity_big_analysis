@@ -19,15 +19,14 @@ matrix_error = pickle.load(open('data/matrix_error_data', 'rb'))
 
 # poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
 
-#todo : here - change culcolation
-def calc_matrix_error(new_skeleton_vector, _skeleton_vectors, _matrix):
-    skeleton_full = [new_skeleton_vector[0], new_skeleton_vector[1], 0, 0,
-                     new_skeleton_vector[2], new_skeleton_vector[3], 0, 0]
+def calc_matrix_error(new_skeleton_vector,new_robot_vector, _skeleton_vectors,_robot_vectors , _matrix):
 
-    _skeleton_vectors_full = np.vstack((_skeleton_vectors, skeleton_full))
-    pinv_skeleton = np.linalg.pinv(_skeleton_vectors_full)
-    true_robot_vectors = np.dot(_skeleton_vectors_full, _matrix)
-    Amat = np.dot(pinv_skeleton, true_robot_vectors)
+    skeleton_vectors = np.vstack((_skeleton_vectors, new_skeleton_vector))
+    robot_vectors = np.vstack((_robot_vectors, new_robot_vector))
+
+    pinv_skeleton = np.linalg.pinv(skeleton_vectors)
+
+    Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
     difference = _matrix - Amat
     difference = difference[(0, 1, 4, 5),]
@@ -62,21 +61,24 @@ def find_optimal_error_sequence(_real_poses_skeleton,_poses_list_robot,_true_mat
 def find_next_pose(poses_list_previous_skeleton,poses_list_previous_robot,left_poses_skeleton,left_poses_robot,_true_matrix):
     errors=[]
     for i in range((len(left_poses_skeleton))):
+
         error=calc_matrix_error(left_poses_skeleton[i],left_poses_robot[i],poses_list_previous_skeleton,poses_list_previous_robot, _true_matrix)
         errors.append(error)
 
     argmin=np.argmin(errors)
 
-    return left_poses_skeleton[argmin],poses_list_previous_robot[argmin],argmin , errors[argmin]
+    return left_poses_skeleton[argmin],left_poses_robot[argmin],argmin , errors[argmin]
 
 
 
 # creating matrix error:
 
 optimal_user_error={}
+delata_optimal_user_error={}
 for subject_id, step in poses.items():
 
     optimal_user_error[subject_id] = {}
+    delata_optimal_user_error[subject_id] = {}
 
     for step_id, step in step.items():
 
@@ -93,11 +95,23 @@ for subject_id, step in poses.items():
                 real_poses_skeleton = section['skeleton']
                 real_poses_robot = section['robot']
 
+                size=min(len(real_poses_skeleton),len(real_poses_robot))
+                # if len(real_poses_robot)!=len(real_poses_skeleton):
+                #     print len(real_poses_robot),'robot'
+                #     print len(real_poses_skeleton)
+                #     delata_optimal_user_error[subject_id][step_id] = None
+                #     continue
 
-                optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses,matrix)
 
-                print 'hhh'
+                optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
+                delta=np.mean(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
 
+                delata_optimal_user_error[subject_id][step_id] = delta
+
+delata_optimal_user_error_df = pd.DataFrame.from_dict(delata_optimal_user_error, orient='index')
+print delata_optimal_user_error_df
+
+print delata_optimal_user_error_df.mean(axis=0)
 
 
 
