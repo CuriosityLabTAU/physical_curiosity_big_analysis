@@ -36,6 +36,8 @@ def analysis_2():
     data_clean = data_clean.drop(data_clean[data_clean.step_id == 0].index)
 
     result = sm.ols(formula="number_of_poses ~ step_id + C(matrix) -1", data=data_clean).fit()
+    result = sm.ols(formula="number_of_poses ~ step_id + C(matrix) -1", data=data_clean).fit()
+
     print(result.summary())
 
 def analysis_3():
@@ -70,6 +72,21 @@ def analysis_3():
     # result = sm.ols(formula="GPA ~ subject_number_of_poses", data=relevant_df).fit()
     print result.summary()
 
+def analysis_4():
+    xls = pd.ExcelFile("data/all_data.xlsx")
+    data_df = xls.parse(0)
+
+    data_clean = data_df.drop(data_df[data_df.step_id == 8].index)
+    data_clean = data_clean.drop(data_clean[data_clean.step_id == 0].index)
+
+    print data_clean
+    df3 = data_clean[data_clean['task_error_subject_matrix'] < 100]
+
+    ax = sns.boxplot(x="matrix", y="task_error_subject_matrix", data=df3)
+
+
+
+    plt.show()
 
 
 analysis_3()
