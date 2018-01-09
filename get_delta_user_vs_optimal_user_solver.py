@@ -29,27 +29,29 @@ def calc_matrix_error(new_skeleton_vector,new_robot_vector, _skeleton_vectors,_r
     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
     difference = _matrix - Amat
-    difference = difference[(0, 1, 4, 5),]
-    difference = difference[:, (0, 1, 4, 5)]
-
     error = np.linalg.norm(difference) / 16
     return error
 
 
 def find_optimal_error_sequence(_real_poses_skeleton,_poses_list_robot,_true_matrix):
     real_poses_skeleton, poses_list_robot = _real_poses_skeleton,_poses_list_robot
-    n_pos=(len(real_poses_skeleton))
 
-    best_order_skeleton = np.empty((0, 8))
-    best_order_robot = np.empty((0, 8))
+    best_order_skeleton = np.empty((0, 4))
+    best_order_robot = np.empty((0, 4))
+
+    for i in range(3):
+        best_order_skeleton = np.vstack((best_order_skeleton, real_poses_skeleton[0][(0, 1, 4, 5),]))
+        best_order_robot = np.vstack((best_order_robot, poses_list_robot[0][(0, 1, 4, 5),]))
+        real_poses_skeleton = np.delete(real_poses_skeleton, 0, 0)
+        poses_list_robot = np.delete(poses_list_robot, 0, 0)
 
     best_error_sequence=[]
+    n_pos=(len(real_poses_skeleton))
 
     for t in range(n_pos):
-
         optimal_pose_skeleton,optimal_pose_robot,optimal_index,last_error=find_next_pose(best_order_skeleton,best_order_robot,real_poses_skeleton, poses_list_robot,_true_matrix)
-        best_order_skeleton=np.vstack((best_order_skeleton, optimal_pose_skeleton))
-        best_order_robot=np.vstack((best_order_robot, optimal_pose_robot))
+        best_order_skeleton=np.vstack((best_order_skeleton, optimal_pose_skeleton[(0, 1, 4, 5),]))
+        best_order_robot=np.vstack((best_order_robot, optimal_pose_robot[(0, 1, 4, 5),]))
         real_poses_skeleton=np.delete(real_poses_skeleton, optimal_index, 0)
         poses_list_robot=np.delete(poses_list_robot, optimal_index, 0)
 
@@ -62,7 +64,7 @@ def find_next_pose(poses_list_previous_skeleton,poses_list_previous_robot,left_p
     errors=[]
     for i in range((len(left_poses_skeleton))):
 
-        error=calc_matrix_error(left_poses_skeleton[i],left_poses_robot[i],poses_list_previous_skeleton,poses_list_previous_robot, _true_matrix)
+        error=calc_matrix_error(left_poses_skeleton[i][(0,1,4,5),],left_poses_robot[i][(0,1,4,5),],poses_list_previous_skeleton,poses_list_previous_robot, _true_matrix)
         errors.append(error)
 
     argmin=np.argmin(errors)
@@ -82,7 +84,8 @@ for subject_id, step in poses.items():
 
     for step_id, step in step.items():
 
-        matrix=poses[subject_id][step_id]['matrix']
+        matrix=poses[subject_id][step_id]['matrix'][(0,1,4,5),]
+        matrix=matrix[:,(0,1,4,5)]
 
         optimal_user_error[subject_id][step_id] = []
 
@@ -96,6 +99,10 @@ for subject_id, step in poses.items():
                 real_poses_robot = section['robot']
 
                 size=min(len(real_poses_skeleton),len(real_poses_robot))
+
+                if size<4:
+                    delata_optimal_user_error[subject_id][step_id] = None
+                    continue
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
                 delta=np.mean(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
