@@ -94,11 +94,11 @@ for subject_id,step in matrix_error.items():
                 min_dict[subject_id][step_id] = min_error
                 mean_dict[subject_id][step_id] = mean_error
             else:
-                min_dict[subject_id][step_id] = None
-                mean_dict[subject_id][step_id] = None
+                min_dict[subject_id][step_id] = 1
+                mean_dict[subject_id][step_id] = 1
         else:
-            min_dict[subject_id][step_id] = None
-            mean_dict[subject_id][step_id] = None
+            min_dict[subject_id][step_id] = 1
+            mean_dict[subject_id][step_id] = 1
 
 
 min_matrix_error=pd.DataFrame.from_dict(min_dict, orient='index')

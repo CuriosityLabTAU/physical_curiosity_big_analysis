@@ -74,7 +74,7 @@ for index, row in aq_data.iterrows():
 
 
 
-    score_dict[index]['total_score']=total_score
+    score_dict[index]['AQ_total_score']=total_score
     score_dict[index]['social_skill'] = social_skill_score
     score_dict[index]['attention_switching'] = attention_switching_score
     score_dict[index]['attention_to_detail'] = attention_to_detail_score
@@ -84,15 +84,15 @@ for index, row in aq_data.iterrows():
 # crate df:
 aq_score_df= pd.DataFrame.from_dict(score_dict, orient='index')
 
-aq_score_df=aq_score_df[['social_skill','attention_switching','attention_to_detail','communication','imagination','total_score']]
+aq_score_df=aq_score_df[['social_skill','attention_switching','attention_to_detail','communication','imagination','AQ_total_score']]
 
 
 ##export to excel
 # Create a Pandas Excel writer using XlsxWriter as the engine.
-writer = pd.ExcelWriter('data/aq_scores.xlsx', engine='xlsxwriter')
+writer = pd.ExcelWriter('data/AQ_scores.xlsx', engine='xlsxwriter')
 
 # Write each dataframe to a different worksheet.
-aq_score_df.to_excel(writer, sheet_name='aq_scores')
+aq_score_df.to_excel(writer, sheet_name='AQ_scores')
 
 
 # Close the Pandas Excel writer and output the Excel file.
