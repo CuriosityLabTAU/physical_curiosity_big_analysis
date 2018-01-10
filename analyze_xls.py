@@ -5,6 +5,7 @@ import pandas as pd
 import statsmodels.formula.api as sm
 import seaborn as sns
 import matplotlib.pyplot as plt
+from factor_analyzer import FactorAnalyzer
 
 def analysis_1():
     xls = pd.ExcelFile("data/big_analysis.xlsx")
@@ -84,10 +85,82 @@ def analysis_4():
 
     ax = sns.boxplot(x="matrix", y="task_error_subject_matrix", data=df3)
 
-
-
     plt.show()
 
+def unite_data():
+    xls = pd.ExcelFile("data/big_analysis.xlsx")
+    section_0 = xls.parse(0)
+    section_1 = xls.parse(1)
+    section_2 = xls.parse(2)
 
-analysis_3()
+    xls = pd.ExcelFile("data/study_summer_data.xlsx")
+    general_data = xls.parse(0)
 
+    xls = pd.ExcelFile("data/BFI_scores.xlsx")
+    bfi_df = xls.parse(0)
+
+    xls = pd.ExcelFile("data/aq_scores.xlsx")
+    aq_df = xls.parse(0)
+
+    all_data_df = pd.concat([general_data, section_0, section_1, section_2, bfi_df, aq_df], axis=1)
+    print('all data:', len(all_data_df), len(all_data_df.columns))
+#
+#
+    u'average_grades',
+
+
+# u'psychometric_grade',
+# u'שולט ברובוט',
+# u'שאלה 1',
+# u'שאלה 2',
+# u'שאלה 3',
+
+    relevant_data = all_data_df[[      #u'age',
+            u'subject_number_of_poses_0',
+            u'min_matrix_error_0',
+        u'mean_matrix_error_0',
+                                       u'task_error_real_matrix_results_0',
+                                       u'task_error_subject_matrix_results_0',
+                                       u'subject_number_of_poses_1',
+                        u'min_matrix_error_1',
+                       u'mean_matrix_error_1',
+          u'task_error_real_matrix_results_1',
+       u'task_error_subject_matrix_results_1',
+                         u'm_number_of_poses',
+                        u'm_min_matrix_error',
+                       u'm_mean_matrix_error',
+          u'm_task_error_real_matrix_results',
+       u'm_task_error_subject_matrix_results'#,
+                       #        u'Extraversion',
+                       #       u'Agreeableness',
+                       #   u'Conscientiousness',
+                       #         u'Neuroticism',
+                       #            u'Openness',
+                       #        u'social_skill',
+                       # u'attention_switching',
+                       # u'attention_to_detail',
+                       #       u'communication',
+                       #         u'imagination',
+                       #         u'total_score',
+                       #          u'bfi_total_score'
+                                       ]]
+
+    return relevant_data
+
+data_df = unite_data()
+data_df = data_df.dropna()
+print(len(data_df), len(data_df.columns))
+
+
+fa = FactorAnalyzer()
+fa.analyze(data_df, len(data_df.columns), rotation='promax')
+ev, v = fa.get_eigenvalues()
+plt.plot(ev)
+plt.show()
+
+n_factors = 4
+fa.analyze(data_df, n_factors, rotation='promax')
+for i in range(1, 1 + n_factors):
+    factor_name = 'Factor%d' % i
+    print('----- %s ------' % factor_name)
+    print(fa.loadings[factor_name][abs(fa.loadings[factor_name]) > 0.4])
