@@ -48,11 +48,11 @@ for subject_id,step in matrix_error.items():
                 min_dict[subject_id][step_id] = min_error
                 mean_dict[subject_id][step_id] = mean_error
             else:
-                min_dict[subject_id][step_id] = None
-                mean_dict[subject_id][step_id] = None
+                min_dict[subject_id][step_id] = 1
+                mean_dict[subject_id][step_id] = 1
         else:
-            min_dict[subject_id][step_id] = None
-            mean_dict[subject_id][step_id] = None
+            min_dict[subject_id][step_id] = 1
+            mean_dict[subject_id][step_id] = 1
 
 #min
 min_matrix_error=pd.DataFrame.from_dict(min_dict, orient='index')
@@ -112,7 +112,7 @@ for subject_id, step in tasks_error_real_matrix.items():
             task_error_real_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_real_matrix_results[subject_id][step_id]=None
+            task_error_real_matrix_results[subject_id][step_id]=360
 
 task_error_real_matrix_results_df=pd.DataFrame.from_dict(task_error_real_matrix_results, orient='index')
 task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns[[0]], axis=1, inplace=True)
@@ -160,7 +160,7 @@ for subject_id, step in tasks_error_subject_matrix.items():
             task_error_subject_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_subject_matrix_results[subject_id][step_id]=None
+            task_error_subject_matrix_results[subject_id][step_id]=360
 
 task_error_subject_matrix_results_df=pd.DataFrame.from_dict(task_error_subject_matrix_results, orient='index')
 

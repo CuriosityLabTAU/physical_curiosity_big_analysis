@@ -84,6 +84,9 @@ for subject_id, step in poses.items():
 
     for step_id, step in step.items():
 
+        if subject_id==56.0:
+            pass
+
         matrix=poses[subject_id][step_id]['matrix'][(0,1,4,5),]
         matrix=matrix[:,(0,1,4,5)]
 
@@ -101,7 +104,7 @@ for subject_id, step in poses.items():
                 size=min(len(real_poses_skeleton),len(real_poses_robot))
 
                 if size<4:
-                    delata_optimal_user_error[subject_id][step_id] = None
+                    delata_optimal_user_error[subject_id][step_id] = 1
                     continue
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
@@ -110,11 +113,11 @@ for subject_id, step in poses.items():
                 delata_optimal_user_error[subject_id][step_id] = delta
 
 delata_optimal_user_error_df = pd.DataFrame.from_dict(delata_optimal_user_error, orient='index')
-print delata_optimal_user_error_df
+# print delata_optimal_user_error_df
+#
+# print delata_optimal_user_error_df.mean(axis=0)
 
-print delata_optimal_user_error_df.mean(axis=0)
 
 
-
-# pickle.dump(obj=delta_user_vs_optimal_user, file=open('data/delta_user_vs_optimal_user', 'wb'))
+pickle.dump(obj=delata_optimal_user_error_df, file=open('data/delta_user_vs_optimal_user', 'wb'))
 

@@ -49,6 +49,7 @@ def linear_regression_from_df(data,m_name):
 #section 0 df
 #section 1 df
 #all other sections
+#section 9
 
 
 ## Number of poses
@@ -70,8 +71,13 @@ section_1_df=pd.DataFrame(subject_number_of_poses_df[2])
 section_1_df.columns.names=['subject_id']
 section_1_df.columns=['subject_number_of_poses_1']
 
+#section 9 df
+section_9_df=pd.DataFrame(subject_number_of_poses_df[12])
+section_9_df.columns.names=['subject_id']
+section_9_df.columns=['subject_number_of_poses_9']
+
 #all other sections df
-other_sections_data= pd.DataFrame(subject_number_of_poses_df.iloc[:,2:])
+other_sections_data= pd.DataFrame(subject_number_of_poses_df.iloc[:,2:8])
 other_sections_df=linear_regression_from_df(other_sections_data,'m_number_of_poses')
 
 
@@ -125,16 +131,25 @@ section_1_mean_matrix_df=pd.DataFrame(mean_matrix_error[2])
 section_1_mean_matrix_df.columns.names=['subject_id']
 section_1_mean_matrix_df.columns=['mean_matrix_error_1']
 
+#section 9:
+section_9_min_matrix_df=pd.DataFrame(min_matrix_error[12])
+section_9_min_matrix_df.columns.names=['subject_id']
+section_9_min_matrix_df.columns=['min_matrix_error_9']
+section_9_mean_matrix_df=pd.DataFrame(mean_matrix_error[12])
+section_9_mean_matrix_df.columns.names=['subject_id']
+section_9_mean_matrix_df.columns=['mean_matrix_error_9']
+
 #all other sections:
-other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:])
+other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:8])
 other_sections_min_matrix_df=linear_regression_from_df(other_sections_min_matrix_data,'m_min_matrix_error')
 
-other_sections_mean_matrix_data= pd.DataFrame(mean_matrix_error.iloc[:,2:])
+other_sections_mean_matrix_data= pd.DataFrame(mean_matrix_error.iloc[:,2:8])
 other_sections_mean_matrix_df=linear_regression_from_df(other_sections_mean_matrix_data,'m_mean_matrix_error')
 
 #conect to df:
 section_0_df = pd.concat([section_0_df, section_0_min_matrix_df,section_0_mean_matrix_df], axis=1)
 section_1_df = pd.concat([section_1_df, section_1_min_matrix_df,section_1_mean_matrix_df], axis=1)
+section_9_df = pd.concat([section_9_df, section_9_min_matrix_df,section_9_mean_matrix_df], axis=1)
 other_sections_df = pd.concat([other_sections_df, other_sections_min_matrix_df,other_sections_mean_matrix_df], axis=1)
 
 
@@ -168,7 +183,7 @@ for subject_id, step in tasks_error_real_matrix.items():
             task_error_real_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_real_matrix_results[subject_id][step_id]=None
+            task_error_real_matrix_results[subject_id][step_id]=360
 
 task_error_real_matrix_results_df=pd.DataFrame.from_dict(task_error_real_matrix_results, orient='index')
 task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns[[0, 9]], axis=1, inplace=True)
@@ -183,6 +198,7 @@ section_0_task_error_real_matrix_results_df.columns=['task_error_real_matrix_res
 section_1_task_error_real_matrix_results_df=pd.DataFrame(task_error_real_matrix_results_df[2])
 section_1_task_error_real_matrix_results_df.columns.names=['subject_id']
 section_1_task_error_real_matrix_results_df.columns=['task_error_real_matrix_results_1']
+
 
 #all other sections:
 other_sections_task_error_real_matrix_results_data= pd.DataFrame(task_error_real_matrix_results_df.iloc[:,2:])
@@ -228,7 +244,7 @@ for subject_id, step in tasks_error_subject_matrix.items():
             task_error_subject_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_subject_matrix_results[subject_id][step_id]=None
+            task_error_subject_matrix_results[subject_id][step_id]=360
 
 task_error_subject_matrix_results_df=pd.DataFrame.from_dict(task_error_subject_matrix_results, orient='index')
 task_error_subject_matrix_results_df.drop(task_error_subject_matrix_results_df.columns[[8]], axis=1, inplace=True)
@@ -253,6 +269,37 @@ section_0_df = pd.concat([section_0_df, section_0_task_error_subject_matrix_resu
 section_1_df = pd.concat([section_1_df, section_1_task_error_subject_matrix_results_df], axis=1)
 other_sections_df = pd.concat([other_sections_df, other_sections_task_error_subject_matrix_results_df], axis=1)
 
+
+
+## Behavior delta
+#lode data
+delata_optimal_user_error_df = pickle.load(open('data/delta_user_vs_optimal_user', 'r'))
+
+#section 0 df
+behavior_delta_0_df=pd.DataFrame(delata_optimal_user_error_df[0])
+behavior_delta_0_df.columns.names=['subject_id']
+behavior_delta_0_df.columns=['behavior_delta_0']
+
+#section 1 df
+behavior_delta_1_df=pd.DataFrame(delata_optimal_user_error_df[2])
+behavior_delta_1_df.columns.names=['subject_id']
+behavior_delta_1_df.columns=['behavior_delta_1']
+
+#section 9 df
+behavior_delta_9_df=pd.DataFrame(delata_optimal_user_error_df[12])
+behavior_delta_9_df.columns.names=['subject_id']
+behavior_delta_9_df.columns=['behavior_delta_9']
+
+#all other sections df
+other_sections_data= pd.DataFrame(delata_optimal_user_error_df.iloc[:,2:8])
+behavior_delta_sections_df=linear_regression_from_df(other_sections_data,'m_behavior_delta')
+
+#conect to df:
+section_0_df = pd.concat([section_0_df, behavior_delta_0_df], axis=1)
+section_1_df = pd.concat([section_1_df, behavior_delta_1_df], axis=1)
+section_9_df = pd.concat([section_9_df, behavior_delta_9_df], axis=1)
+other_sections_df = pd.concat([other_sections_df, behavior_delta_sections_df], axis=1)
+
 ##export to excel
 # Create a Pandas Excel writer using XlsxWriter as the engine.
 writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
@@ -260,6 +307,7 @@ writer = pd.ExcelWriter('data/big_analysis.xlsx', engine='xlsxwriter')
 # Write each dataframe to a different worksheet.
 section_0_df.to_excel(writer, sheet_name='section_0')
 section_1_df.to_excel(writer, sheet_name='section_1')
+section_9_df.to_excel(writer, sheet_name='section_9')
 other_sections_df.to_excel(writer, sheet_name='other_sections')
 
 # Close the Pandas Excel writer and output the Excel file.
