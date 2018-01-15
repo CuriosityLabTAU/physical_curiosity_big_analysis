@@ -87,31 +87,31 @@ matrix_error = pickle.load(open('data/matrix_error_data', 'r'))
 
 #crate df:
 min_dict={}
-mean_dict={}
+sum_dict={}
 for subject_id,step in matrix_error.items():
     min_dict[subject_id] = {}
-    mean_dict[subject_id] = {}
+    sum_dict[subject_id] = {}
 
     for step_id, errors in step.items():
         if 'error' in errors.keys():
             if len(errors['error'])>0:
                 min_error=min(errors['error'])
-                mean_error=np.nanmean(errors['error'])
+                sum_error=np.nansum(errors['error'])
                 min_dict[subject_id][step_id] = min_error
-                mean_dict[subject_id][step_id] = mean_error
+                sum_dict[subject_id][step_id] = sum_error
             else:
                 min_dict[subject_id][step_id] = 1
-                mean_dict[subject_id][step_id] = 1
+                sum_dict[subject_id][step_id] = 100
         else:
             min_dict[subject_id][step_id] = 1
-            mean_dict[subject_id][step_id] = 1
+            sum_dict[subject_id][step_id] = 100
 
 
 min_matrix_error=pd.DataFrame.from_dict(min_dict, orient='index')
 min_matrix_error.columns.names=['subject_id']
 
-mean_matrix_error=pd.DataFrame.from_dict(mean_dict, orient='index')
-mean_matrix_error.columns.names=['subject_id']
+sum_matrix_error=pd.DataFrame.from_dict(sum_dict, orient='index')
+sum_matrix_error.columns.names=['subject_id']
 
 
 
@@ -119,38 +119,38 @@ mean_matrix_error.columns.names=['subject_id']
 section_0_min_matrix_df=pd.DataFrame(min_matrix_error[0])
 section_0_min_matrix_df.columns.names=['subject_id']
 section_0_min_matrix_df.columns=['min_matrix_error_0']
-section_0_mean_matrix_df=pd.DataFrame(mean_matrix_error[0])
-section_0_mean_matrix_df.columns.names=['subject_id']
-section_0_mean_matrix_df.columns=['mean_matrix_error_0']
+section_0_sum_matrix_df=pd.DataFrame(sum_matrix_error[0])
+section_0_sum_matrix_df.columns.names=['subject_id']
+section_0_sum_matrix_df.columns=['sum_matrix_error_0']
 
 #section 1:
 section_1_min_matrix_df=pd.DataFrame(min_matrix_error[2])
 section_1_min_matrix_df.columns.names=['subject_id']
 section_1_min_matrix_df.columns=['min_matrix_error_1']
-section_1_mean_matrix_df=pd.DataFrame(mean_matrix_error[2])
-section_1_mean_matrix_df.columns.names=['subject_id']
-section_1_mean_matrix_df.columns=['mean_matrix_error_1']
+section_1_sum_matrix_df=pd.DataFrame(sum_matrix_error[2])
+section_1_sum_matrix_df.columns.names=['subject_id']
+section_1_sum_matrix_df.columns=['sum_matrix_error_1']
 
 #section 9:
 section_9_min_matrix_df=pd.DataFrame(min_matrix_error[12])
 section_9_min_matrix_df.columns.names=['subject_id']
 section_9_min_matrix_df.columns=['min_matrix_error_9']
-section_9_mean_matrix_df=pd.DataFrame(mean_matrix_error[12])
-section_9_mean_matrix_df.columns.names=['subject_id']
-section_9_mean_matrix_df.columns=['mean_matrix_error_9']
+section_9_sum_matrix_df=pd.DataFrame(sum_matrix_error[12])
+section_9_sum_matrix_df.columns.names=['subject_id']
+section_9_sum_matrix_df.columns=['sum_matrix_error_9']
 
 #all other sections:
 other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:8])
 other_sections_min_matrix_df=linear_regression_from_df(other_sections_min_matrix_data,'m_min_matrix_error')
 
-other_sections_mean_matrix_data= pd.DataFrame(mean_matrix_error.iloc[:,2:8])
-other_sections_mean_matrix_df=linear_regression_from_df(other_sections_mean_matrix_data,'m_mean_matrix_error')
+other_sections_sum_matrix_data= pd.DataFrame(sum_matrix_error.iloc[:,2:8])
+other_sections_sum_matrix_df=linear_regression_from_df(other_sections_sum_matrix_data,'m_sum_matrix_error')
 
 #conect to df:
-section_0_df = pd.concat([section_0_df, section_0_min_matrix_df,section_0_mean_matrix_df], axis=1)
-section_1_df = pd.concat([section_1_df, section_1_min_matrix_df,section_1_mean_matrix_df], axis=1)
-section_9_df = pd.concat([section_9_df, section_9_min_matrix_df,section_9_mean_matrix_df], axis=1)
-other_sections_df = pd.concat([other_sections_df, other_sections_min_matrix_df,other_sections_mean_matrix_df], axis=1)
+section_0_df = pd.concat([section_0_df, section_0_min_matrix_df,section_0_sum_matrix_df], axis=1)
+section_1_df = pd.concat([section_1_df, section_1_min_matrix_df,section_1_sum_matrix_df], axis=1)
+section_9_df = pd.concat([section_9_df, section_9_min_matrix_df,section_9_sum_matrix_df], axis=1)
+other_sections_df = pd.concat([other_sections_df, other_sections_min_matrix_df,other_sections_sum_matrix_df], axis=1)
 
 
 ##Task error - real matrix:
@@ -271,34 +271,34 @@ other_sections_df = pd.concat([other_sections_df, other_sections_task_error_subj
 
 
 
-## Behavior delta
+## Behavior gamma
 #lode data
-delata_optimal_user_error_df = pickle.load(open('data/delta_user_vs_optimal_user', 'r'))
+gamma_optimal_user_error_df = pickle.load(open('data/gamma_user_vs_optimal_user', 'r'))
 
 #section 0 df
-behavior_delta_0_df=pd.DataFrame(delata_optimal_user_error_df[0])
-behavior_delta_0_df.columns.names=['subject_id']
-behavior_delta_0_df.columns=['behavior_delta_0']
+behavior_gamma_0_df=pd.DataFrame(gamma_optimal_user_error_df[0])
+behavior_gamma_0_df.columns.names=['subject_id']
+behavior_gamma_0_df.columns=['behavior_gamma_0']
 
 #section 1 df
-behavior_delta_1_df=pd.DataFrame(delata_optimal_user_error_df[2])
-behavior_delta_1_df.columns.names=['subject_id']
-behavior_delta_1_df.columns=['behavior_delta_1']
+behavior_gamma_1_df=pd.DataFrame(gamma_optimal_user_error_df[2])
+behavior_gamma_1_df.columns.names=['subject_id']
+behavior_gamma_1_df.columns=['behavior_gamma_1']
 
 #section 9 df
-behavior_delta_9_df=pd.DataFrame(delata_optimal_user_error_df[12])
-behavior_delta_9_df.columns.names=['subject_id']
-behavior_delta_9_df.columns=['behavior_delta_9']
+behavior_gamma_9_df=pd.DataFrame(gamma_optimal_user_error_df[12])
+behavior_gamma_9_df.columns.names=['subject_id']
+behavior_gamma_9_df.columns=['behavior_gamma_9']
 
 #all other sections df
-other_sections_data= pd.DataFrame(delata_optimal_user_error_df.iloc[:,2:8])
-behavior_delta_sections_df=linear_regression_from_df(other_sections_data,'m_behavior_delta')
+other_sections_gamma= pd.DataFrame(gamma_optimal_user_error_df.iloc[:,2:8])
+behavior_gamma_sections_df=linear_regression_from_df(other_sections_data,'m_behavior_gamma')
 
 #conect to df:
-section_0_df = pd.concat([section_0_df, behavior_delta_0_df], axis=1)
-section_1_df = pd.concat([section_1_df, behavior_delta_1_df], axis=1)
-section_9_df = pd.concat([section_9_df, behavior_delta_9_df], axis=1)
-other_sections_df = pd.concat([other_sections_df, behavior_delta_sections_df], axis=1)
+section_0_df = pd.concat([section_0_df, behavior_gamma_0_df], axis=1)
+section_1_df = pd.concat([section_1_df, behavior_gamma_1_df], axis=1)
+section_9_df = pd.concat([section_9_df, behavior_gamma_9_df], axis=1)
+other_sections_df = pd.concat([other_sections_df, behavior_gamma_sections_df], axis=1)
 
 ##export to excel
 # Create a Pandas Excel writer using XlsxWriter as the engine.

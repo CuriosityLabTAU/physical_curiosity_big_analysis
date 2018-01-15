@@ -76,16 +76,13 @@ def find_next_pose(poses_list_previous_skeleton,poses_list_previous_robot,left_p
 # creating matrix error:
 
 optimal_user_error={}
-delata_optimal_user_error={}
+gamma_optimal_user_error={}
 for subject_id, step in poses.items():
 
     optimal_user_error[subject_id] = {}
-    delata_optimal_user_error[subject_id] = {}
+    gamma_optimal_user_error[subject_id] = {}
 
     for step_id, step in step.items():
-
-        if subject_id==56.0:
-            pass
 
         matrix=poses[subject_id][step_id]['matrix'][(0,1,4,5),]
         matrix=matrix[:,(0,1,4,5)]
@@ -104,20 +101,20 @@ for subject_id, step in poses.items():
                 size=min(len(real_poses_skeleton),len(real_poses_robot))
 
                 if size<4:
-                    delata_optimal_user_error[subject_id][step_id] = 1
+                    gamma_optimal_user_error[subject_id][step_id] = 100
                     continue
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
-                delta=np.mean(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
+                gamma=np.nansum(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
 
-                delata_optimal_user_error[subject_id][step_id] = delta
+                gamma_optimal_user_error[subject_id][step_id] = gamma
 
-delata_optimal_user_error_df = pd.DataFrame.from_dict(delata_optimal_user_error, orient='index')
+gamma_optimal_user_error_df = pd.DataFrame.from_dict(gamma_optimal_user_error, orient='index')
 # print delata_optimal_user_error_df
 #
 # print delata_optimal_user_error_df.mean(axis=0)
 
 
 
-pickle.dump(obj=delata_optimal_user_error_df, file=open('data/delta_user_vs_optimal_user', 'wb'))
+pickle.dump(obj=gamma_optimal_user_error_df, file=open('data/gamma_user_vs_optimal_user', 'wb'))
 
