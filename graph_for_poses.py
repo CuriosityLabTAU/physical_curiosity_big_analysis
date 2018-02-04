@@ -18,23 +18,32 @@ from os.path import isfile, join
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
-
+bridge=CvBridge()
 ###Parameters:
 median_filter_window = 31
 movement_threshold = 0.002
 
 
-def get_poses(angles):
-    t = [i for i in range(angles.shape[0])]
+def get_poses(angles,time):
+    # t = [i for i in range(angles.shape[0])]
+    time=time-min(time)
+    t= time
     # plt.plot(t, angles[:,0:])
 
     f_angles = medfilt(angles[:, :], [median_filter_window, 1])
-    plt.plot(t, f_angles)
-    plt.show()
+
 
     d_angles = np.gradient(f_angles, axis=0)
     total_derivative = np.sum(d_angles ** 2, axis=1)
-    plt.plot(t, total_derivative)
+    plt.plot(t, total_derivative,label='total derivative')
+    horiz_line_data = np.array([movement_threshold for i in xrange(t.shape[0])])
+    plt.plot(t, horiz_line_data, 'r--',label='movement threshold')
+    plt.ylim([-0.001, 0.01])
+    plt.xlim([30, 40])
+    plt.ylabel('Total derivative '+r'($radians^2$)')
+    plt.xlabel('Time (sec)')
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=5)
     plt.show()
 
     # binarize to movement/no-movement
@@ -55,6 +64,28 @@ def get_poses(angles):
     # print(middle_bin)
 
     pose = angles[middle_bin,:]
+
+    #plot
+    plt.plot(t, f_angles[:,0],label='Left shoulder joint front and back')
+    plt.plot(t, f_angles[:,1],label='Left shoulder joint right and left')
+    plt.plot(t, f_angles[:,4],label='Right shoulder joint front and back')
+    plt.plot(t, f_angles[:,5],label='Right shoulder joint right and left')
+
+    plt.plot(t[middle_bin], f_angles[middle_bin,0],'k*')
+    plt.plot(t[middle_bin], f_angles[middle_bin,1],'k*')
+    plt.plot(t[middle_bin], f_angles[middle_bin,4],'k*')
+    plt.plot(t[middle_bin], f_angles[middle_bin,5],'k*')
+
+
+    plt.ylabel('Angles (radians)')
+    plt.xlabel('Time (sec)')
+
+    plt.xlim([30, 40])
+
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=5)
+    plt.show()
+
     return pose ,middle_bin
 
 
@@ -81,7 +112,9 @@ for subject_id, step in data.items():
 
                     skeleton_angles[i, :] = np.array([float(x) for x in d['skeleton'].split(',')])
 
-get_poses(skeleton_angles)
+pose ,middle_bin = get_poses(skeleton_angles,time_stamp)
+time_of_bins=time_stamp[middle_bin].tolist()
+time_of_bins = [ round(elem[0], 1) for elem in time_of_bins ]
 
 # get a list of all the relevant bag files
 
@@ -213,81 +246,22 @@ for f in files:
                     section_id=0
 
 
-            if 'affdex' in topic:
-                dict = {}
-                for m in affdex_list:
-                    dict[m] = eval('msg.' + m)
-                    if m == 'face_points':
-                        n_list = []
-                        o_list = dict[m]
-                        for point in o_list:
-                            n_list.append({"x": point.x, "y": point.y})
-                        dict[m] = n_list
-                affdex = dict
-
-
-              # for each section
-            # if 'nao_movements' in topic:
-            #    #          get command to robot
-            #     current_nao_movements = msg.data
-
-
-            # time between skeleton_angles is +- 0.04
-            # time between robot angles is +- 0.09
-
-
-            if 'nao_angles_topic' in topic:
-                #       get command to robot
-
-                is_nao_angles_topic = True
-
-                list_of_movements_str = msg.data
-                list_of_movements = list_of_movements_str[1:-1].split(', ')
-
-                current_nao_movements = (list_of_movements[2:4]+[0.0,0.0]+list_of_movements[-6:-4]+[0.0,0.0])
-
-                current_nao_movements= str([float(x) for x in current_nao_movements])
-                current_nao_movements= current_nao_movements[1:-1]
-
-            if 'to_nao' in topic:
-                #       get command to robot
-                if'change_pose' in msg.data:
-                    current_nao_command = msg.data
-
-            if 'skeleton_angle' in topic:
-                #       get raw skeleton markers
-                current_skeleton_angle = msg.data
-                # print current_skeleton_angle
-
-                    #dict[id] = dict[section] = array(dict{skeleton, robot, time})
-                if is_working==True:
-                    if step in data[subject_id]:
-                        if sections[section_id] in data[subject_id][step]:
-                            if current_skeleton_angle is not None and current_nao_movements is not None and current_nao_command is not None:
-                                new_data = {
-                                    'time': (t - t0).to_sec(),
-                                    'skeleton': current_skeleton_angle,
-                                    'robot_cimmand':current_nao_command,
-                                    'robot': current_nao_movements,
-                                    'affdex':affdex
-                                }
-                                data[subject_id][step][sections[section_id]]['data'].append(new_data)
-
-
             if step==4:
                 if section_id==0:
-                    if topic== '/cam0/usb_cam/image_raw':
-                        pass
-                        im_raw=msg.data
-                        plt.imshow(np.reshape(im_raw,(x,y,3)))
+                    if topic== '/usb_cam/image_raw':
+                        if (t - t0).to_sec() < (40+time_stamp[0]) and (t - t0).to_sec() > (30+time_stamp[0]):
+                            print "here"
+                            if round((t - t0).to_sec(), 1) in time_of_bins:
+                                cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
+                                plt.imshow(cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB))
+                                plt.show()
+
+            if step==5:
+                break
 
 
-        if is_nao_angles_topic==False:
-            subjects_with_no_angles_topic.append(subject_id)
 
-        # except:
-        #     print('error')
-        #     data.pop(subject_id)
+
 
 
 
