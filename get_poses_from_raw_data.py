@@ -22,9 +22,9 @@ movement_threshold = 0.002
 ### Get poses from data:
 def get_poses(angles):
     t = angles[:, 0]
-    # plt.plot(t, angles[:,1:])
+    # plt.plot(t, angles[:,:])
 
-    f_angles = medfilt(angles[:, 1:], [median_filter_window, 1])
+    f_angles = medfilt(angles[:, :], [median_filter_window, 1])
     # plt.plot(t, f_angles)
 
     d_angles = np.gradient(f_angles, axis=0)
@@ -53,16 +53,13 @@ def get_poses(angles):
     return pose ,middle_bin
 
 #Save skeleton robot poses, depending on delay:
-data = pickle.load(open('raw_data_all_merged', 'rb'))
+data = pickle.load(open('data/new_data/raw_data_all_merged', 'rb'))
 for delay in range(0,50):
     print delay
     # data[id][step][section] = array(dict{skeleton, robot, time})
     poses = {}
 
     for subject_id, step in data.items():           # go over subject
-
-        # if subject_id==63.0 or subject_id==67.0 or subject_id==53.0:
-        #     continue
 
         if subject_id==1.0 or subject_id==51.0:
             continue
