@@ -63,7 +63,7 @@ for index, row in BFI_data.iterrows():
             Openness_score.append(question_score)
     if index==67:
         pass
-    score_dict[index]['total_score']=np.nanmean(total_score)
+    score_dict[index]['BFI_total_score']=np.nanmean(total_score)
     score_dict[index]['Extraversion'] = np.nanmean(Extraversion_score)
     score_dict[index]['Agreeableness'] = np.nanmean(Agreeableness_score)
     score_dict[index]['Conscientiousness'] = np.nanmean(Conscientiousness_score)
@@ -72,7 +72,7 @@ for index, row in BFI_data.iterrows():
 
 # crate df:
 BFI_score_df= pd.DataFrame.from_dict(score_dict, orient='index')
-BFI_score_df=BFI_score_df[['Extraversion','Agreeableness','Conscientiousness','Neuroticism','Openness','total_score']]
+BFI_score_df=BFI_score_df[['Extraversion','Agreeableness','Conscientiousness','Neuroticism','Openness','BFI_total_score']]
 
 
 ##export to excel

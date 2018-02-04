@@ -52,78 +52,78 @@ for subject_id, step in poses.items():
                 task_error[subject_id][step_id][section_id]={'task':section['task'],'error':[]}
 
                 for i, d in enumerate(section['time']):
-                    pose = section['skeleton'][i]
+                    pose = section['skeleton'][i][(0,1,4,5),]
 
                     error=0
                     task_pose_original=0
                     if section['task'] == 'two_hands_forward':
-                        task_pose_original=np.dot(pinv(matrix), np.array([0.00, 0.00, 0.00, -0.034, 0.00, 0.00, 0.00, 0.034]))
+                        task_pose_original=np.dot(pinv(matrix,0.9), np.array([0.00, 0.00, 0.00, 0.00]))
                         error=pose-task_pose_original
 
                     elif section['task'] == 'two_hands_down':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.25, 0.00, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix,0.9), np.array([1.25, 0.00, 1.25, 0.00]))
                         error = pose - task_pose_original
 
                     elif section['task'] == 'two_hands_to_the_side':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.45, 1.30, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix,0.9), np.array([1.45, 1.30, 1.45, -1.30]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'two_hands_up':
-                        task_pose_original = np.dot(pinv(matrix), np.array([-1.25, 0.0, 0.00 , -0.034, -1.25, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix,0.9), np.array([-1.25, 0.0, -1.25, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_up_left_hand_down':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.25, 0.0, 0.00, -0.034, -1.25, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.25, 0.0, -1.25, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_up_left_hand_forward':
-                        task_pose_original = np.dot(pinv(matrix), np.array([0.0, 0.0, 0.00, -0.034, -1.25, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([0.0, 0.0, -1.25, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_up_left_hand_to_the_side':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.45, 1.3, 0.00, -0.034, -1.25, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.45, 1.3, -1.25, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_forward_left_hand_down':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.25, 0.00, 0.00, -0.034, 0.0, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.25, 0.00, 0.0, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_forward_left_hand_side':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.45, 1.3, 0.00, -0.034,  0.0, 0.0, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.45, 1.3,  0.0, 0.0]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_to_the_side_left_hand_down':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.25, 0.00, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.25, 0.00, 1.45, -1.30]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_to_the_side_left_hand_forward':
-                        task_pose_original = np.dot(pinv(matrix), np.array([0.00, 0.00, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([0.00, 0.00, 1.45, -1.30]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_down_left_hand_to_the_side':
-                        task_pose_original = np.dot(pinv(matrix), np.array([1.45, 1.30, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([1.45, 1.30, 1.25, 0.00]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'right_hand_down_left_hand_forward':
-                        task_pose_original = np.dot(pinv(matrix), np.array([0.00, 0.00, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([0.00, 0.00, 1.25, 0.00]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_down':
-                        task_pose_original = np.dot(pinv(matrix), np.array([-1.25, 0.0, 0.00, -0.034, 1.25, 0.00, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([-1.25, 0.0, 1.25, 0.00]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_forward':
-                        task_pose_original = np.dot(pinv(matrix), np.array([-1.25, 0.0, 0.00, -0.034, 0.00, 0.00, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([-1.25, 0.0, 0.00, 0.00]))
                         error = (pose - task_pose_original)
 
                     elif section['task'] == 'left_hand_up_right_hand_to_the_side':
-                        task_pose_original = np.dot(pinv(matrix), np.array([-1.25, 0.0, 0.00, -0.034, 1.45, -1.30, 0.00, 0.034]))
+                        task_pose_original = np.dot(pinv(matrix, 0.9), np.array([-1.25, 0.0, 1.45, -1.30]))
                         error = (pose - task_pose_original)
 
                     if section['task']==0:
                         continue
 
-                    agg_error=np.rad2deg((np.linalg.norm(error[(0,1,4,5),]))/4)
+                    agg_error=np.rad2deg((np.linalg.norm(error))/4)
 
                     task_error[subject_id][step_id][section_id]['error'].append(agg_error)
                     task_error[subject_id][step_id][section_id]['min_error'] = min(task_error[subject_id][step_id][section_id]['error'])

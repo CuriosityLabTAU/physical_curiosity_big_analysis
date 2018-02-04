@@ -35,24 +35,24 @@ matrix_error = pickle.load(open('data/matrix_error_data', 'rb'))
 
 #crate df:
 min_dict={}
-mean_dict={}
+sum_dict={}
 for subject_id,step in matrix_error.items():
     min_dict[subject_id] = {}
-    mean_dict[subject_id] = {}
+    sum_dict[subject_id] = {}
 
     for step_id, errors in step.items():
         if 'error' in errors.keys():
             if len(errors['error'])>0:
                 min_error=min(errors['error'])
-                mean_error=np.nanmean(errors['error'])
+                sum_error=np.nansum(errors['error'])
                 min_dict[subject_id][step_id] = min_error
-                mean_dict[subject_id][step_id] = mean_error
+                sum_dict[subject_id][step_id] = sum_error
             else:
-                min_dict[subject_id][step_id] = None
-                mean_dict[subject_id][step_id] = None
+                min_dict[subject_id][step_id] = 1
+                sum_dict[subject_id][step_id] = 100
         else:
-            min_dict[subject_id][step_id] = None
-            mean_dict[subject_id][step_id] = None
+            min_dict[subject_id][step_id] = 1
+            sum_dict[subject_id][step_id] = 100
 
 #min
 min_matrix_error=pd.DataFrame.from_dict(min_dict, orient='index')
@@ -66,20 +66,20 @@ min_matrix_error_three_columns_df=pd.melt(min_matrix_error,id_vars='subject_id',
 min_matrix_error_three_columns_df.columns=['subject_id','step_id','min_matrix_error']
 
 #mean
-mean_matrix_error=pd.DataFrame.from_dict(mean_dict, orient='index')
-mean_matrix_error.columns.names=['subject_id']
+sum_matrix_error=pd.DataFrame.from_dict(sum_dict, orient='index')
+sum_matrix_error.columns.names=['subject_id']
 
-mean_matrix_error.reset_index(inplace=True)
-mean_matrix_error.columns = ['subject_id']+[i for i in range(9)]
+sum_matrix_error.reset_index(inplace=True)
+sum_matrix_error.columns = ['subject_id']+[i for i in range(9)]
 
 keys = [i for i in range(9)]
-mean_matrix_error_three_columns_df=pd.melt(mean_matrix_error,id_vars='subject_id', value_vars=keys, value_name='mean_matrix_error')
-mean_matrix_error_three_columns_df.columns=['subject_id','step_id','mean_matrix_error']
+sum_matrix_error_three_columns_df=pd.melt(sum_matrix_error,id_vars='subject_id', value_vars=keys, value_name='sum_matrix_error')
+sum_matrix_error_three_columns_df.columns=['subject_id','step_id','sum_matrix_error']
 
 
 #Join
 three_columns_df = pd.merge(three_columns_df, min_matrix_error_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
-three_columns_df = pd.merge(three_columns_df, mean_matrix_error_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
+three_columns_df = pd.merge(three_columns_df, sum_matrix_error_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
 
 
 ##Task error - real matrix:
@@ -112,7 +112,7 @@ for subject_id, step in tasks_error_real_matrix.items():
             task_error_real_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_real_matrix_results[subject_id][step_id]=None
+            task_error_real_matrix_results[subject_id][step_id]=360
 
 task_error_real_matrix_results_df=pd.DataFrame.from_dict(task_error_real_matrix_results, orient='index')
 task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns[[0]], axis=1, inplace=True)
@@ -160,7 +160,7 @@ for subject_id, step in tasks_error_subject_matrix.items():
             task_error_subject_matrix_results[subject_id][step_id]=np.nanmean(step_results)
 
         else:
-            task_error_subject_matrix_results[subject_id][step_id]=None
+            task_error_subject_matrix_results[subject_id][step_id]=360
 
 task_error_subject_matrix_results_df=pd.DataFrame.from_dict(task_error_subject_matrix_results, orient='index')
 
@@ -205,6 +205,73 @@ matrix_info_df_three_columns_df.columns = ['subject_id', 'step_id', 'matrix']
 
 #Join
 three_columns_df = pd.merge(three_columns_df, matrix_info_df_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
+####
+## Behavior gamma
+#lode data
+behavior_gamma_df = pickle.load(open('data/gamma_user_vs_optimal_user', 'r'))
+
+#crate df:
+# behavior_gamma_df=pd.DataFrame.from_dict(gamma_optimal_user_error_df, orient='index')
+# behavior_gamma_df.drop(behavior_gamma_df.columns[[1]], axis=1, inplace=True)  #delete the second epoch(no learning)
+behavior_gamma_df.reset_index(inplace=True)
+behavior_gamma_df.columns = ['subject_id']+[i for i in range(9)]
+keys = [i for i in range(9)]
+
+behavior_gamma_three_columns_df=pd.melt(behavior_gamma_df,id_vars='subject_id', value_vars=keys, value_name='behavior_gamma')
+behavior_gamma_three_columns_df.columns=['subject_id','step_id','behavior_gamma']
+#Join
+three_columns_df = pd.merge(three_columns_df, behavior_gamma_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
+
+########################
+##Task error - real matrix:
+#lode data
+tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'rb'))
+
+#task dict:
+tasks={'two_hands_forward':1, 'two_hands_down':2, 'two_hands_to_the_side':3, 'two_hands_up':4,
+       'right_hand_up_left_hand_down':5, 'right_hand_up_left_hand_forward':6, 'right_hand_up_left_hand_to_the_side':7, 'right_hand_forward_left_hand_down':8,
+       'right_hand_forward_left_hand_side':9, 'right_hand_to_the_side_left_hand_down':10, 'right_hand_to_the_side_left_hand_forward':11, 'right_hand_down_left_hand_to_the_side':12,
+       'right_hand_down_left_hand_forward':13, 'left_hand_up_right_hand_down':14, 'left_hand_up_right_hand_forward':15, 'left_hand_up_right_hand_to_the_side':16
+       }
+
+#crate df:
+
+task_error_real_matrix={}
+for subject_id, step in tasks_error_real_matrix.items():
+
+    task_error_real_matrix[subject_id] = {}
+
+    for step_id, step in step.items():
+
+        task_error_real_matrix[subject_id][step_id] = {1:None, 2:None, 3:None, 4:None, 5:None, 6:None, 7:None,
+                                                       8:None, 9:None, 10:None, 11:None, 12:None, 13:None, 14:None, 15:None, 16:None}
+
+        for section_id in step.keys():
+
+            if 'min_error' in tasks_error_real_matrix[subject_id][step_id][section_id].keys():
+                task= tasks_error_real_matrix[subject_id][step_id][section_id]['task']
+                task_number=tasks[task]
+
+                task_error_real_matrix[subject_id][step_id][task_number]=tasks_error_real_matrix[subject_id][step_id][section_id]['min_error']
+
+task_real_matrix_df=pd.DataFrame.from_dict(task_error_real_matrix, orient='index')
+task_real_matrix_df.drop(task_real_matrix_df.columns[[0]], axis=1, inplace=True)
+
+task_real_matrix_df.reset_index(inplace=True)
+task_real_matrix_df.columns = ['subject_id']+[i for i in range(9)]
+
+keys = [i for i in range(9)]
+task_real_matrix_three_columns_df=pd.melt(task_real_matrix_df,id_vars='subject_id', value_vars=keys, value_name='task_real_matrix')
+task_real_matrix_three_columns_df.columns=['subject_id','step_id','task_real_matrix']
+
+task_real_matrix_three_columns_df[[i for i in range(1,17)]] = task_real_matrix_three_columns_df.task_real_matrix.apply(pd.Series)
+task_real_matrix_three_columns_df=task_real_matrix_three_columns_df.drop('task_real_matrix', axis=1)
+
+#Join
+three_columns_df = pd.merge(three_columns_df, task_real_matrix_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
+
+#######################
+
 
 ##export to excel
 # Create a Pandas Excel writer using XlsxWriter as the engine.

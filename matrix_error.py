@@ -24,7 +24,8 @@ for subject_id, step in poses.items():
 
     for step_id, step in step.items():
 
-        matrix=poses[subject_id][step_id]['matrix']
+        matrix=poses[subject_id][step_id]['matrix'][(0,1,4,5),]
+        matrix=matrix[:,(0,1,4,5)]
 
 
         for section_id in step.keys():
@@ -37,24 +38,24 @@ for subject_id, step in poses.items():
 
                 section=poses[subject_id][step_id][section_id]
 
-                skeleton_vectors=np.empty((0,8))
+                skeleton_vectors=np.empty((0,4))
 
-                robot_vectors =np.empty((0,8))
+                robot_vectors =np.empty((0,4))
 
 
                 for i, d in enumerate(section['time']):
-                    skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i]))
-                    robot_vectors=np.vstack((robot_vectors, section['robot'][i]))
+                    skeleton_vectors=np.vstack((skeleton_vectors, section['skeleton'][i][(0,1,4,5),]))
+                    robot_vectors=np.vstack((robot_vectors, section['robot'][i][(0,1,4,5),]))
 
-                    # if i > 3:
-                    pinv_skeleton = np.linalg.pinv(skeleton_vectors)
+                    if i < 3:
+                        continue
+
+                    pinv_skeleton = pinv(skeleton_vectors)
                     # Amat = np.dot(pinv_skeleton, robot_vectors)
                     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
 
                     difference=matrix - Amat
-                    difference=difference[(0,1,4,5),]
-                    difference=difference[:,(0,1,4,5)]
 
                     error= np.linalg.norm(difference)/16
 
@@ -74,6 +75,11 @@ for subject_id, step in poses.items():
 
 pickle.dump(obj=matrix_error, file=open('data/matrix_error_data', 'wb'))
 
+for subject_id, matrix_step in matrix_error.items():
+    for step_id, matrix_pose in matrix_step.items():
+        plt.plot(matrix_pose['error'])
+        plt.title(str(subject_id) + ',' + str(step_id))
+        plt.show()
 
 
 # last_matrix_error={}
@@ -119,11 +125,3 @@ pickle.dump(obj=matrix_error, file=open('data/matrix_error_data', 'wb'))
 # print parameter_c_df
 
 
-#make is simpol from the start - 4*4 - will find the problom!
-
-#
-# for subject_id, matrix_step in matrix_error.items():
-#     for step_id, matrix_pose in matrix_step.items():
-#         plt.plot(matrix_pose)
-#         plt.title(str(subject_id) + ',' + str(step_id))
-#         plt.show()
