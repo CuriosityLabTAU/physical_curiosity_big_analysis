@@ -7,13 +7,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from factor_analyzer import FactorAnalyzer
 
+
+base_path = 'C:/Goren/CuriosityLab/Code/python/physical_curiosity_big_analysis/data/'
+
+
 def analysis_1():
-    xls = pd.ExcelFile("data/big_analysis.xlsx")
+    xls = pd.ExcelFile("%s/big_analysis.xlsx" % base_path)
     section_0 = xls.parse(0)
     section_1 = xls.parse(1)
     print(section_0.columns)
 
-    xls = pd.ExcelFile("data/study_summer_data.xlsx")
+    xls = pd.ExcelFile("%s/study_summer_data.xlsx" % base_path)
     general_data = xls.parse(0)
     print(general_data.columns)
 
@@ -30,7 +34,7 @@ def analysis_1():
     # plt.show()
 
 def analysis_2():
-    xls = pd.ExcelFile("data/all_data.xlsx")
+    xls = pd.ExcelFile("%s/all_data.xlsx" % base_path)
     data_df = xls.parse(0)
 
     data_clean = data_df.drop(data_df[data_df.step_id == 8].index)
@@ -42,7 +46,7 @@ def analysis_2():
     print(result.summary())
 
 def analysis_3():
-    xls = pd.ExcelFile("data/big_analysis.xlsx")
+    xls = pd.ExcelFile("%s/big_analysis.xlsx" % base_path)
     section_0_df = xls.parse(0)
     section_1_df = xls.parse(1)
     section_2_df = xls.parse(2)
@@ -50,11 +54,11 @@ def analysis_3():
     section_0_df['poses_binary'] = section_0_df.apply(lambda row: row.subject_number_of_poses_0 > 10, axis=1)
     print(section_0_df.head)
 
-    xls = pd.ExcelFile("data/study_summer_data.xlsx")
+    xls = pd.ExcelFile("%s/study_summer_data.xlsx" % base_path)
     general_data = xls.parse(0)
     print(general_data.columns)
 
-    xls = pd.ExcelFile("data/BFI_scores.xlsx")
+    xls = pd.ExcelFile("%s/BFI_scores.xlsx" % base_path)
     bfi_df = xls.parse(0)
 
     all_data_df = pd.concat([general_data, section_0_df, section_1_df, section_2_df, bfi_df], axis=1)
@@ -74,7 +78,7 @@ def analysis_3():
     print result.summary()
 
 def analysis_4():
-    xls = pd.ExcelFile("data/all_data.xlsx")
+    xls = pd.ExcelFile("%s/all_data.xlsx"  % base_path)
     data_df = xls.parse(0)
 
     data_clean = data_df.drop(data_df[data_df.step_id == 8].index)
@@ -88,18 +92,18 @@ def analysis_4():
     plt.show()
 
 def unite_data():
-    xls = pd.ExcelFile("data/big_analysis.xlsx")
+    xls = pd.ExcelFile("%s/big_analysis.xlsx"  % base_path)
     section_0 = xls.parse(0)
     section_1 = xls.parse(1)
     section_2 = xls.parse(2)
 
-    xls = pd.ExcelFile("data/study_summer_data.xlsx")
+    xls = pd.ExcelFile("%s/study_summer_data.xlsx"  % base_path)
     general_data = xls.parse(0)
 
-    xls = pd.ExcelFile("data/BFI_scores.xlsx")
+    xls = pd.ExcelFile("%s/BFI_scores.xlsx"  % base_path)
     bfi_df = xls.parse(0)
 
-    xls = pd.ExcelFile("data/aq_scores.xlsx")
+    xls = pd.ExcelFile("%s/aq_scores.xlsx" % base_path)
     aq_df = xls.parse(0)
 
     all_data_df = pd.concat([general_data, section_0, section_1, section_2, bfi_df, aq_df], axis=1)
