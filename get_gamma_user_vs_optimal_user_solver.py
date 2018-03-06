@@ -77,10 +77,13 @@ def find_next_pose(poses_list_previous_skeleton,poses_list_previous_robot,left_p
 
 optimal_user_error={}
 gamma_optimal_user_error={}
+optimal_user_error_sequence={}
+
 for subject_id, step in poses.items():
 
     optimal_user_error[subject_id] = {}
     gamma_optimal_user_error[subject_id] = {}
+    optimal_user_error_sequence[subject_id]={}
 
     for step_id, step in step.items():
 
@@ -88,6 +91,7 @@ for subject_id, step in poses.items():
         matrix=matrix[:,(0,1,4,5)]
 
         optimal_user_error[subject_id][step_id] = []
+
 
         for section_id in step.keys():
 
@@ -108,13 +112,13 @@ for subject_id, step in poses.items():
                 gamma=np.nansum(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
 
                 gamma_optimal_user_error[subject_id][step_id] = gamma
+                optimal_user_error_sequence[subject_id][step_id] = optimal_user_error[subject_id][step_id]
 
 gamma_optimal_user_error_df = pd.DataFrame.from_dict(gamma_optimal_user_error, orient='index')
-# print delata_optimal_user_error_df
-#
-# print delata_optimal_user_error_df.mean(axis=0)
 
 
 
-pickle.dump(obj=gamma_optimal_user_error_df, file=open('data/gamma_user_vs_optimal_user', 'wb'))
+# pickle.dump(obj=gamma_optimal_user_error_df, file=open('data/gamma_user_vs_optimal_user', 'wb'))
+pickle.dump(obj=optimal_user_error_sequence, file=open('data/optimal_user_error_sequence', 'wb'))
+
 

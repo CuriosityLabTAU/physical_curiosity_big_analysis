@@ -116,13 +116,6 @@ pose ,middle_bin = get_poses(skeleton_angles,time_stamp)
 time_of_bins=time_stamp[middle_bin].tolist()
 time_of_bins = [ round(elem[0], 1) for elem in time_of_bins ]
 
-# get a list of all the relevant bag files
-
-
-#   for each section
-#       get raw skeleton markers
-#       get command to robot
-#       dict[id] = dict[section] = array(dict{skeleton, robot, time})
 
 
 
@@ -258,11 +251,4 @@ for f in files:
 
             if step==5:
                 break
-
-
-
-
-
-
-
 
