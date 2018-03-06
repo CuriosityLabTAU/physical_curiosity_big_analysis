@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import pickle
 import seaborn as sns
 import numpy as np
-
+import pandas as pd
 
 # load all the relevant data
-raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
-matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
-optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
+# raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
+# matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
+# optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
+subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'r'))
 
 
 # === data processing ===
@@ -126,8 +127,45 @@ def figure_4():
 # figure 5: how did we compute slopes
 # axis: x-axis sessions 2-8, y-axis: for each measure X6
 # draw for one subject (highest R^2), points and slope
+def linear_regression_plot(data,_xlabel,_ylabel,_title):
+
+    # start from 0:
+    y = data - data[0]
+    len_x = len(y)
+    y = np.array(y)
+    x = [i for i in range(len_x)]
+
+    # crate x for a non intercepted linear regressio
+    x = x[:, np.newaxis]
+
+    # run linear regression
+    m, _, _, _ = np.linalg.lstsq(x, y)
+
+    #plot style:
+    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+
+    plt.plot(x, y, '.')
+    plt.plot(x, m * x , '-')
+
+    plt.ylabel(_ylabel)
+    plt.xlabel(_xlabel)
+    plt.title(_title)
+    plt.show()
 
 
+def figure_5():
+    ## --Number of poses--
+    subject_number_of_poses
+
+    # crate df:
+    subject_number_of_poses_df = pd.DataFrame.from_dict(subject_number_of_poses, orient='index')
+    subject_number_of_poses_df.drop(subject_number_of_poses_df.columns[[1]], axis=1,
+                                    inplace=True)  # delete the second epoch(no learning)
+    other_sections_data = pd.DataFrame(subject_number_of_poses_df.iloc[:, 2:8])
+    for i in range(other_sections_data.shape[0]):
+        linear_regression_plot(other_sections_data.values[i],'section','number of poses','linear regression of number of poses in each section')
+
+# figure_5()
 
 # === data analysis ====
 
