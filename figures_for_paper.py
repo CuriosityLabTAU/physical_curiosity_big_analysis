@@ -7,8 +7,8 @@ import pandas as pd
 
 # load all the relevant data
 # raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
-# matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
-# optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
+matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
+optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
 subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'r'))
 
 
@@ -84,7 +84,6 @@ def figure_3():
 
     plt.show()
 
-
 # figure 4: what is matrix error
 # axis: x-axis p, y-axis matrix error
 # draw average over participants, for all sections
@@ -136,6 +135,7 @@ def linear_regression_plot(data,_xlabel,_ylabel,_title):
     x = [i for i in range(len_x)]
 
     # crate x for a non intercepted linear regressio
+    x = np.array(x)
     x = x[:, np.newaxis]
 
     # run linear regression
@@ -162,10 +162,8 @@ def figure_5():
     subject_number_of_poses_df.drop(subject_number_of_poses_df.columns[[1]], axis=1,
                                     inplace=True)  # delete the second epoch(no learning)
     other_sections_data = pd.DataFrame(subject_number_of_poses_df.iloc[:, 2:8])
-    for i in range(other_sections_data.shape[0]):
-        linear_regression_plot(other_sections_data.values[i],'section','number of poses','linear regression of number of poses in each section')
+    linear_regression_plot(other_sections_data.values[2],'section','number of poses','linear regression of number of poses in each section')
 
-figure_5()
 
 # === data analysis ====
 
