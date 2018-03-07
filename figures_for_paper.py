@@ -10,6 +10,9 @@ import pandas as pd
 matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
 optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
 subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'r'))
+tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'r'))
+tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'r'))
+gamma_optimal_user_error_df = pickle.load(open('data/gamma_user_vs_optimal_user', 'r'))
 
 
 # === data processing ===
@@ -163,6 +166,125 @@ def figure_5():
                                     inplace=True)  # delete the second epoch(no learning)
     other_sections_data = pd.DataFrame(subject_number_of_poses_df.iloc[:, 2:8])
     linear_regression_plot(other_sections_data.values[2],'section','number of poses','linear regression of number of poses in each section')
+
+    ##--Matrix error:--
+    # crate df:
+    min_dict = {}
+    sum_dict = {}
+    for subject_id, step in matrix_error_data.items():
+        min_dict[subject_id] = {}
+        sum_dict[subject_id] = {}
+
+        for step_id, errors in step.items():
+            if 'error' in errors.keys():
+                if len(errors['error']) > 0:
+                    min_error = min(errors['error'])
+                    sum_error = np.nansum(errors['error'])
+                    min_dict[subject_id][step_id] = min_error
+                    sum_dict[subject_id][step_id] = sum_error
+                else:
+                    min_dict[subject_id][step_id] = 1
+                    sum_dict[subject_id][step_id] = 100
+            else:
+                min_dict[subject_id][step_id] = 1
+                sum_dict[subject_id][step_id] = 100
+
+    min_matrix_error = pd.DataFrame.from_dict(min_dict, orient='index')
+    min_matrix_error.columns.names = ['subject_id']
+
+    sum_matrix_error = pd.DataFrame.from_dict(sum_dict, orient='index')
+    sum_matrix_error.columns.names = ['subject_id']
+
+    #all other sections:
+    other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:8])
+    linear_regression_plot(other_sections_min_matrix_data.values[46],'section','min matrix error','linear regression of min matrix error in each section')
+
+    other_sections_sum_matrix_data= pd.DataFrame(sum_matrix_error.iloc[:,2:8])
+    linear_regression_plot(other_sections_sum_matrix_data.values[46],'section','sum matrix error','linear regression of sum matrix error in each section')
+
+
+    ##--Task error - real matrix--:
+    # crate df:
+    pass_threshold = 20
+
+    task_error_real_matrix_results = {}
+    for subject_id, step in tasks_error_real_matrix.items():
+
+        task_error_real_matrix_results[subject_id] = {}
+
+        for step_id, step in step.items():
+
+            task_error_real_matrix_results[subject_id][step_id] = 0
+
+            step_results = []
+
+            for section_id in step.keys():
+
+                if 'min_error' in tasks_error_real_matrix[subject_id][step_id][section_id].keys():
+                    step_results.append(tasks_error_real_matrix[subject_id][step_id][section_id]['min_error'])
+
+            if len(step_results) > 0:
+                task_error_real_matrix_results[subject_id][step_id] = np.nanmean(step_results)
+
+            else:
+                task_error_real_matrix_results[subject_id][step_id] = 360
+
+    task_error_real_matrix_results_df = pd.DataFrame.from_dict(task_error_real_matrix_results, orient='index')
+    task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns[[0, 9]], axis=1, inplace=True)
+
+
+    # all other sections:
+    other_sections_task_error_real_matrix_results_data = pd.DataFrame(task_error_real_matrix_results_df.iloc[:, 2:])
+    linear_regression_plot(other_sections_task_error_real_matrix_results_data.values[54],'section','task error','linear regression of task error real matrix in each section')
+
+    ##--Task error - subject matrix--:
+
+    #crate df:
+    pass_threshold=20
+
+    task_error_subject_matrix_results={}
+    for subject_id, step in tasks_error_subject_matrix.items():
+
+        task_error_subject_matrix_results[subject_id] = {}
+
+        for step_id, step in step.items():
+
+            task_error_subject_matrix_results[subject_id][step_id] = 0
+
+            step_results=[]
+
+            if subject_id==15.0:
+                pass
+
+            if step is not None:
+                for section_id in step.keys():
+
+                    if 'min_error' in tasks_error_subject_matrix[subject_id][step_id][section_id].keys():
+
+                        step_results.append(tasks_error_subject_matrix[subject_id][step_id][section_id]['min_error'])
+
+
+
+            if len(step_results)>0:
+                task_error_subject_matrix_results[subject_id][step_id]=np.nanmean(step_results)
+
+            else:
+                task_error_subject_matrix_results[subject_id][step_id]=360
+
+    task_error_subject_matrix_results_df=pd.DataFrame.from_dict(task_error_subject_matrix_results, orient='index')
+    task_error_subject_matrix_results_df.drop(task_error_subject_matrix_results_df.columns[[8]], axis=1, inplace=True)
+
+    #all other sections:
+    other_sections_task_error_subject_matrix_results_data= pd.DataFrame(task_error_subject_matrix_results_df.iloc[:,2:])
+    linear_regression_plot(other_sections_task_error_subject_matrix_results_data.values[20],'section','task error','linear regression of task error subject matrix in each section')
+
+    ##-- Behavior gamma--
+
+    #all other sections df
+    other_sections_gamma= pd.DataFrame(gamma_optimal_user_error_df.iloc[:,2:8])
+    linear_regression_plot(other_sections_gamma.values[46],'section','behavior gamma','linear regression of behavior gamma in each section')
+
+figure_5()
 
 
 # === data analysis ====
