@@ -20,7 +20,7 @@ sections = ['learn', 'task1', 'task2', 'task3']
 affdex_list=['emotions','expressions','measurements','face_points','face_x_alignment',
              'face_y_alignment','face_tracking_deltax','face_distance','face_detected','tega_affect_msg','attention_detected']
 
-mypath = '/home/matan/Desktop/data/'
+mypath = '/home/matan/Desktop/data2/'
 
 files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and '.bag' in f]
 subjects_with_no_angles_topic=[]
@@ -203,6 +203,6 @@ for f in files:
 print(data.keys())
 print 'subjects_with_no_angles_topic: ',subjects_with_no_angles_topic
 
-pickle.dump(obj=data, file=open('data/raw_data_all_5', 'wb'))
+pickle.dump(obj=data, file=open('data/raw_data_all_2000', 'wb'))
 
 

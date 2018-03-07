@@ -75,11 +75,11 @@ for subject_id, step in poses.items():
 
 pickle.dump(obj=matrix_error, file=open('data/matrix_error_data', 'wb'))
 
-for subject_id, matrix_step in matrix_error.items():
-    for step_id, matrix_pose in matrix_step.items():
-        plt.plot(matrix_pose['error'])
-        plt.title(str(subject_id) + ',' + str(step_id))
-        plt.show()
+# for subject_id, matrix_step in matrix_error.items():
+#     for step_id, matrix_pose in matrix_step.items():
+#         plt.plot(matrix_pose['error'])
+#         plt.title(str(subject_id) + ',' + str(step_id))
+#         plt.show()
 
 
 # last_matrix_error={}

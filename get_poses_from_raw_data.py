@@ -53,8 +53,8 @@ def get_poses(angles):
     return pose ,middle_bin
 
 #Save skeleton robot poses, depending on delay:
-data = pickle.load(open('data/new_data/raw_data_all_merged', 'rb'))
-for delay in range(0,50):
+data = pickle.load(open('data/raw_data_all_merged_2000', 'rb'))
+for delay in range(21,22):
     print delay
     # data[id][step][section] = array(dict{skeleton, robot, time})
     poses = {}

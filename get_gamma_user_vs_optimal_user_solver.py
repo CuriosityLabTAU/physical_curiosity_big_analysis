@@ -118,7 +118,7 @@ gamma_optimal_user_error_df = pd.DataFrame.from_dict(gamma_optimal_user_error, o
 
 
 
-# pickle.dump(obj=gamma_optimal_user_error_df, file=open('data/gamma_user_vs_optimal_user', 'wb'))
+pickle.dump(obj=gamma_optimal_user_error_df, file=open('data/gamma_user_vs_optimal_user', 'wb'))
 pickle.dump(obj=optimal_user_error_sequence, file=open('data/optimal_user_error_sequence', 'wb'))
 
 

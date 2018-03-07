@@ -165,7 +165,7 @@ def figure_5():
     for i in range(other_sections_data.shape[0]):
         linear_regression_plot(other_sections_data.values[i],'section','number of poses','linear regression of number of poses in each section')
 
-# figure_5()
+figure_5()
 
 # === data analysis ====
 

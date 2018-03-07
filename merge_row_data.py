@@ -3,8 +3,8 @@ import pickle
 
 
 
-data1 = pickle.load(open('data/raw_data_all', 'rb'))
-data2 = pickle.load(open('data/raw_data_all_5', 'rb'))
+data1 = pickle.load(open('data/raw_data_all_merged', 'rb'))
+data2 = pickle.load(open('data/raw_data_all_2000', 'rb'))
 
 subject_id_data1 = []
 subject_id_data2 = []
@@ -24,4 +24,4 @@ data1.update(data2) #merge
 
 
 
-pickle.dump(obj=data1, file=open('raw_data_all_merged', 'wb'))
+pickle.dump(obj=data1, file=open('raw_data_all_merged_2000', 'wb'))
