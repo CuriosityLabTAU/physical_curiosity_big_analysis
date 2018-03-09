@@ -4,6 +4,9 @@ import pickle
 import seaborn as sns
 import numpy as np
 import pandas as pd
+import statsmodels.formula.api as sm
+from factor_analyzer import FactorAnalyzer
+
 
 # load all the relevant data
 # raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
@@ -96,13 +99,15 @@ def figure_4():
     sns.set_style("darkgrid", {"axes.facecolor": ".9"})
 
     # data collection
-    steps=[0,2,4,5,7,8,10,11,12]
-    step_dict={0:[], 2:[], 4:[], 5:[], 7:[], 8:[], 10:[], 11:[], 12:[]}
+    steps=[0,2,4,5,7,8,10,11]
+    step_dict={0:[], 2:[], 4:[], 5:[], 7:[], 8:[], 10:[], 11:[]}
     for subject_id, step in matrix_error_data.items():
             for step_id, errors in step.items():
-                    if 'error' in errors.keys():
-                        if len(errors['error']) > 0:
-                            step_dict[step_id].append(errors['error'])
+                if step_id==12:
+                    continue
+                if 'error' in errors.keys():
+                    if len(errors['error']) > 0:
+                        step_dict[step_id].append(errors['error'])
     n = 1
     for step in steps:
 
@@ -125,10 +130,10 @@ def figure_4():
     plt.xlim([0, 15])
     plt.show()
 
-
 # figure 5: how did we compute slopes
 # axis: x-axis sessions 2-8, y-axis: for each measure X6
 # draw for one subject (highest R^2), points and slope
+# TODO: choose the subject with the minimal sum_R (minimum because R < 0
 def linear_regression_plot(data,_xlabel,_ylabel,_title):
 
     # start from 0:
@@ -284,35 +289,184 @@ def figure_5():
     other_sections_gamma= pd.DataFrame(gamma_optimal_user_error_df.iloc[:,2:8])
     linear_regression_plot(other_sections_gamma.values[46],'section','behavior gamma','linear regression of behavior gamma in each section')
 
-figure_5()
+# figure_5()
+
+
 
 
 # === data analysis ====
+measures_data = {}
+measures_data['section_1'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_0')
+measures_data['section_2'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_1')
+measures_data['section_9'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_9')
+measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetname='other_sections')
+
+# remove outliers
+# in section 1, only those who did something
+measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['subject_number_of_poses_0'] > 0]
+# error cannot be too big
+measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['sum_matrix_error_0'] < 100]
+# min matrix error cannot be too big
+measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
+
+# in section 2, only with more than 3
+measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
+
+# TODO: add study data and
+# external = pd.read_excel("data/study_summer_data.xlsx")
+
+# TODO: add external to []
+all_measures = pd.concat([measures_data['section_1'], measures_data['section_2'],
+                          measures_data['section_other'], measures_data['section_9']], axis=1)
+
 
 # figure 6: measures' histograms
 # 6 X 4 subplots
 # each row is a section (1, 2, overline, 9)
 # each column is a measure
 # each subplot is a histogram of that measure
+def figure_6():
+    # subplot
+    for section in ['section_1', 'section_2', 'section_other', 'section_9']:
+        sec_data = measures_data[section]
+        for col in sec_data.columns:
+            plt.hist(sec_data[col].values)
+            plt.title('%s %s' %(section, col))
+            plt.show()
 
+
+# figure_6()
 
 # figure 7: measures' correlation
 # matrix/table: 24 X 24 (all measure X all measures
 # Value is R, but only if p<0.05
+def figure_7():
+    corr_coef = all_measures.corr()
+    plt.matshow(all_measures.corr())
+    plt.colorbar()
+    # plt.show()
 
+    print(corr_coef)
 
+# figure_7()
 
 # === internal insights ===
 # figure 8: do participants who explore more learn more with time
 # formula: (\delta^i | \tilde\delta) ~ matrix^i + i + (n_pose^i | b_...)
 
+step_data = pd.read_excel('data/all_data.xlsx')
+step_data = step_data[step_data['task_error_real_matrix'] < 100]
+step_data = step_data[step_data['min_matrix_error'] < 1]
+step_data = step_data[step_data['sum_matrix_error'] < 100]
+
+
+def figure_8():
+    result = sm.ols(formula="task_error_real_matrix ~ step_id + C(matrix) + number_of_poses -1",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: matrix effected, number of poses effect task error
+    #             step_id is not correlated,
+    # ==> they did not reduce the task error with steps (time)
+
+    # result = sm.ols(formula="task_error_subject_matrix ~ step_id + C(matrix) + number_of_poses -1",
+    #                 data=step_data).fit()
+    # print result.summary()
+
+
+    result = sm.ols(formula="min_matrix_error ~ step_id  + C(matrix) -1",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+
+    result = sm.ols(formula="sum_matrix_error ~ step_id  + C(matrix) -1",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+
+    result = sm.ols(formula="behavior_gamma ~ step_id  + C(matrix) -1",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+    #    ==> participants improved their poses selection, but not order
+    #    ==> learned "macro" exploration, but not "micro" exploration
+
+    # =====> the task was too hard to learn
+    # they did not improve in task performance
+    # they did not improve in local/micro exploration
+    # they did improve their exploration strategy
+
+
+
+# figure 8.a: x-axis: number of poses, y-axis:task_error_real_matrix
+#       plot all data points, and the linear line that describes them
+def figure_8a():
+    result = sm.ols(formula="task_error_real_matrix ~ number_of_poses",
+                    data=step_data).fit()
+    print result.summary()
+    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+    sns.jointplot(x="number_of_poses", y="task_error_real_matrix", data=step_data, kind="reg")
+    # sns.regplot(x="number_of_poses", y="task_error_real_matrix", data=step_data)
+    plt.xlabel('Number of poses')
+    plt.ylabel(r"$\delta$" +'- error in task')
+    plt.title('Linear regression between number of poses and task error ' +r"($\delta$)")
+
+    plt.show()
+
+
+# figure 8.b: x-axis: step_id, y-ais: min_matrix_error
+#       plot all data points, and the linear line that describes them
+def figure_8b():
+    result = sm.ols(formula="min_matrix_error ~ step_id",
+                    data=step_data).fit()
+    print result.summary()
+    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+    sns.jointplot(x="step_id", y="min_matrix_error", data=step_data, kind="reg")
+    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+    # sns.regplot(x="step_id", y="min_matrix_error", data=step_data)
+    plt.xlabel('Section id')
+    plt.ylabel(r"$b_{global}$ -"+'min matrix error')
+    plt.title('Linear regression between section id and min matrix error '+r"($b_{global})$")
+
+    plt.show()
 
 # === external validation ===
+
+
 # formula '(CEI | BFI | PET) ~ factor(measures)'
 
 # ad_hoc (figure 7) ==> 3 measures
 
 
+def figure_9():
+    fa = FactorAnalyzer()
+    fa.analyze(all_measures, len(all_measures.columns), rotation='promax')
+    ev, v = fa.get_eigenvalues()
+    plt.plot(ev)
+    # plt.show()
+
+    n_factors = 4
+    fa.analyze(all_measures, n_factors, rotation='promax')
+    for i in range(1, 1 + n_factors):
+        factor_name = 'Factor%d' % i
+        print('----- %s ------' % factor_name)
+        print(fa.loadings[factor_name][abs(fa.loadings[factor_name]) > 0.4])
+
+    x = np.zeros([all_measures.shape[0], n_factors])
+    for i in range(1, 1 + n_factors):
+        # print(np.expand_dims(fa.loadings[factor_name], 1).shape)
+        # print(all_measures.values.shape)
+        x[:, i-1] = np.squeeze(np.dot(all_measures.values,  np.expand_dims(fa.loadings[factor_name], 1)))
 
 
+    # convert x into data_frame, columns = factor_1, factor_2
+    factor_df = pd.DataFrame(x, columns=['factor_1','factor_2','factor_3','factor_4'],index=all_measures.index)
+    print factor_df
+
+    # TODO: after we have study data, change CEI
+    result = sm.ols(formula="CEI ~ factor_1 + factor_2",
+                    data=all_measures).fit()
+    print result.summary()
+
+
+# figure_9()
 
