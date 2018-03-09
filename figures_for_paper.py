@@ -329,6 +329,9 @@ all_measures = pd.concat([measures_data['section_1'], measures_data['section_2']
                           measures_data['section_other'], measures_data['section_9']], axis=1)
 
 
+
+
+
 # figure 6: measures' histograms
 # 6 X 4 subplots
 # each row is a section (1, 2, overline, 9)
@@ -475,7 +478,8 @@ def figure_9():
     factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
 
     #after we have study data, change CEI
-    result = sm.ols(formula="average_grades ~  factor_2",
+    result = sm.ols(formula="CEI_II_Total ~ factor_1 + factor_2 +factor_3 + factor_4",
                     data=factors_and_external_df).fit()
     print result.summary()
 
+figure_9()
