@@ -312,10 +312,19 @@ measures_data['section_1'] = measures_data['section_1'][measures_data['section_1
 # in section 2, only with more than 3
 measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
 
-# TODO: add study data and
-# external = pd.read_excel("data/study_summer_data.xlsx")
+## external data:
+external_AQ = pd.read_excel("data/AQ_scores.xlsx")
+external_BFI = pd.read_excel("data/BFI_scores.xlsx")
+external_general=pd.read_excel("data/study_summer_data.xlsx")
+external_tablet=pd.read_excel("data/data_from_tablet.xlsx")
+#fix index for tablet data:
+subject_id_for_tablet=external_tablet['subject_id']
+external_tablet.index=subject_id_for_tablet
 
-# TODO: add external to []
+all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['BFI_total_score'],
+                             external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
+
+
 all_measures = pd.concat([measures_data['section_1'], measures_data['section_2'],
                           measures_data['section_other'], measures_data['section_9']], axis=1)
 
@@ -460,13 +469,13 @@ def figure_9():
 
     # convert x into data_frame, columns = factor_1, factor_2
     factor_df = pd.DataFrame(x, columns=['factor_1','factor_2','factor_3','factor_4'],index=all_measures.index)
-    print factor_df
+    print factor_df.shape
 
-    # TODO: after we have study data, change CEI
-    result = sm.ols(formula="CEI ~ factor_1 + factor_2",
-                    data=all_measures).fit()
+    # factor df and external_data df:
+    factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
+
+    #after we have study data, change CEI
+    result = sm.ols(formula="average_grades ~  factor_2",
+                    data=factors_and_external_df).fit()
     print result.summary()
-
-
-# figure_9()
 
