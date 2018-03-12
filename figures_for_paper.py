@@ -63,42 +63,6 @@ def figure_2():
 
     plt.show()
 
-def figure_21():
-    step_n=0
-    subject_id_n=18
-
-    # collect matrix error data:
-    matrix_error=[]
-    for subject_id, step in matrix_error_data.items():
-        if subject_id==subject_id_n:
-            for step_id, errors in step.items():
-                if step_id == step_n:
-                    if 'error' in errors.keys():
-                        if len(errors['error']) > 0:
-                            matrix_error = errors['error']
-                            break
-
-    # collect matrix optimal error:
-    optimal_error=optimal_user_error_sequence[subject_id_n][step_n]
-    x=[i for i in range(len(matrix_error))]
-
-    #plot
-    # plt.figure()
-    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
-
-    plt.plot(x, matrix_error ,label='Matrix error')
-    plt.plot(x, optimal_error,label='Optimal error')
-
-    plt.ylabel('Error')
-    plt.xlabel('Number of pose')
-    plt.title('Matrix error and optimal error - for one subject for section two')
-
-
-    plt.legend(loc='upper right', fancybox=True, shadow=True, ncol=5)
-
-    plt.show()
-figure_21()
-
 
 # figure 3: what is matrix error
 # axis: x-axis p, y-axis matrix error
@@ -339,14 +303,14 @@ measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetna
 
 # remove outliers
 # in section 1, only those who did something
-measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['subject_number_of_poses_0'] > 0]
+# measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['subject_number_of_poses_0'] > 0]
 # error cannot be too big
-measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['sum_matrix_error_0'] < 100]
+# measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['sum_matrix_error_0'] < 100]
 # min matrix error cannot be too big
-measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
+# measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
 
 # in section 2, only with more than 3
-measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
+# measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
 
 ## external data:
 external_AQ = pd.read_excel("data/AQ_scores.xlsx")
@@ -363,6 +327,8 @@ all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['BFI_to
 
 all_measures = pd.concat([measures_data['section_1'], measures_data['section_2'],
                           measures_data['section_other'], measures_data['section_9']], axis=1)
+
+all_data_df=pd.concat([all_measures, all_external_data,], axis=1)
 
 
 
@@ -402,7 +368,7 @@ def figure_7():
 
 step_data = pd.read_excel('data/all_data.xlsx')
 step_data = step_data[step_data['task_error_real_matrix'] < 100]
-step_data = step_data[step_data['min_matrix_error'] < 1]
+# step_data = step_data[step_data['min_matrix_error'] < 1]
 step_data = step_data[step_data['sum_matrix_error'] < 100]
 
 
@@ -514,5 +480,16 @@ def figure_9():
     #after we have study data, change CEI
     result = sm.ols(formula="psychometric_grade ~ factor_1 + factor_2 +factor_3 + factor_4",
                     data=factors_and_external_df).fit()
+    print result.summary()
+
+#matan's play
+def figure_10():
+    result = sm.ols(formula="subject_number_of_poses_0  ~ C(gender) -1",
+                    data=all_data_df).fit()
+    print result.summary()
+
+
+    result = sm.ols(formula=" AQ_total_score ~ subject_number_of_poses_0",
+                    data=all_data_df).fit()
     print result.summary()
 
