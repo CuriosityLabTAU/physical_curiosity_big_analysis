@@ -63,6 +63,42 @@ def figure_2():
 
     plt.show()
 
+def figure_21():
+    step_n=0
+    subject_id_n=18
+
+    # collect matrix error data:
+    matrix_error=[]
+    for subject_id, step in matrix_error_data.items():
+        if subject_id==subject_id_n:
+            for step_id, errors in step.items():
+                if step_id == step_n:
+                    if 'error' in errors.keys():
+                        if len(errors['error']) > 0:
+                            matrix_error = errors['error']
+                            break
+
+    # collect matrix optimal error:
+    optimal_error=optimal_user_error_sequence[subject_id_n][step_n]
+    x=[i for i in range(len(matrix_error))]
+
+    #plot
+    # plt.figure()
+    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+
+    plt.plot(x, matrix_error ,label='Matrix error')
+    plt.plot(x, optimal_error,label='Optimal error')
+
+    plt.ylabel('Error')
+    plt.xlabel('Number of pose')
+    plt.title('Matrix error and optimal error - for one subject for section two')
+
+
+    plt.legend(loc='upper right', fancybox=True, shadow=True, ncol=5)
+
+    plt.show()
+figure_21()
+
 
 # figure 3: what is matrix error
 # axis: x-axis p, y-axis matrix error
@@ -330,8 +366,6 @@ all_measures = pd.concat([measures_data['section_1'], measures_data['section_2']
 
 
 
-
-
 # figure 6: measures' histograms
 # 6 X 4 subplots
 # each row is a section (1, 2, overline, 9)
@@ -478,8 +512,7 @@ def figure_9():
     factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
 
     #after we have study data, change CEI
-    result = sm.ols(formula="CEI_II_Total ~ factor_1 + factor_2 +factor_3 + factor_4",
+    result = sm.ols(formula="psychometric_grade ~ factor_1 + factor_2 +factor_3 + factor_4",
                     data=factors_and_external_df).fit()
     print result.summary()
 
-figure_9()

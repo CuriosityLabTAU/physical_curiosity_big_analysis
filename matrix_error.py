@@ -31,6 +31,9 @@ for subject_id, step in poses.items():
         for section_id in step.keys():
 
             if section_id=='learn':
+                if subject_id==18:
+                    if step_id==0:
+                        pass
 
                 matrix_error[subject_id][step_id] = {}
                 matrix_error[subject_id][step_id]['error'] = []
@@ -50,7 +53,7 @@ for subject_id, step in poses.items():
                     if i < 3:
                         continue
 
-                    pinv_skeleton = pinv(skeleton_vectors)
+                    pinv_skeleton = pinv(skeleton_vectors,0.00001)
                     # Amat = np.dot(pinv_skeleton, robot_vectors)
                     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
