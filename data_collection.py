@@ -292,7 +292,7 @@ behavior_gamma_9_df.columns=['behavior_gamma_9']
 
 #all other sections df
 other_sections_gamma= pd.DataFrame(gamma_optimal_user_error_df.iloc[:,2:8])
-behavior_gamma_sections_df=linear_regression_from_df(other_sections_data,'m_behavior_gamma')
+behavior_gamma_sections_df=linear_regression_from_df(other_sections_gamma,'m_behavior_gamma')
 
 #conect to df:
 section_0_df = pd.concat([section_0_df, behavior_gamma_0_df], axis=1)

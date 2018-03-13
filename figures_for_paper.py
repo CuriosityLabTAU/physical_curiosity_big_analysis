@@ -160,6 +160,41 @@ def linear_regression_plot(data,_xlabel,_ylabel,_title):
     plt.title(_title)
     plt.show()
 
+def linear_regression_from_df(data,m_name,r_name):
+    subjects=[]
+    m_list=[]
+    r_list=[]
+    for row in data.iterrows():
+
+        y = row[1].values.tolist()
+        len_x = len(y)
+        y = np.array(y)
+        x = [i for i in range(len_x)]
+        x = np.array(x)
+
+        #take out nones:
+        none_index=np.argwhere(np.isnan(y))
+        y=np.delete(y, none_index, 0)
+        x=np.delete(x, none_index, 0)
+        #start from 0:
+        y=y-y[0]
+
+        # crate x for a non intercepted linear regressio
+        x = x[:, np.newaxis]
+
+        #run linear regression
+        m, _, _, _ = np.linalg.lstsq(x, y)
+        m_list.append(m)
+        subjects.append(row[0])
+
+        model, resid = np.linalg.lstsq(x, y)[:2]
+
+        r2 = 1 - resid / (y.size * y.var())
+        r_list.append(r2)
+
+    df = pd.DataFrame(np.column_stack([m_list,r_list]),columns=[m_name,r_name],index=subjects)
+    df.columns.names = ['subject_id']
+    return df
 
 def figure_5():
     ## --Number of poses--
@@ -171,6 +206,7 @@ def figure_5():
                                     inplace=True)  # delete the second epoch(no learning)
     other_sections_data = pd.DataFrame(subject_number_of_poses_df.iloc[:, 2:8])
     linear_regression_plot(other_sections_data.values[2],'section','number of poses','linear regression of number of poses in each section')
+    r_m_number_of_poses_df=linear_regression_from_df(other_sections_data,'m_subject_number_of_poses','r_subject_number_of_poses')
 
     ##--Matrix error:--
     # crate df:
@@ -203,9 +239,12 @@ def figure_5():
     #all other sections:
     other_sections_min_matrix_data= pd.DataFrame(min_matrix_error.iloc[:,2:8])
     linear_regression_plot(other_sections_min_matrix_data.values[46],'section','min matrix error','linear regression of min matrix error in each section')
+    r_m_min_matrix_df=linear_regression_from_df(other_sections_min_matrix_data,'m_min_matrix','r_min_matrix')
+
 
     other_sections_sum_matrix_data= pd.DataFrame(sum_matrix_error.iloc[:,2:8])
     linear_regression_plot(other_sections_sum_matrix_data.values[46],'section','sum matrix error','linear regression of sum matrix error in each section')
+    r_m_sum_matrix_df = linear_regression_from_df(other_sections_sum_matrix_data,'m_sum_matrix','r_sum_matrix')
 
 
     ##--Task error - real matrix--:
@@ -241,6 +280,9 @@ def figure_5():
     # all other sections:
     other_sections_task_error_real_matrix_results_data = pd.DataFrame(task_error_real_matrix_results_df.iloc[:, 2:])
     linear_regression_plot(other_sections_task_error_real_matrix_results_data.values[54],'section','task error','linear regression of task error real matrix in each section')
+    r_m_task_error_real_matrix_df=linear_regression_from_df(other_sections_task_error_real_matrix_results_data,'m_task_error_real_matrix','r_task_error_real_matrix')
+
+
 
     ##--Task error - subject matrix--:
 
@@ -288,6 +330,10 @@ def figure_5():
     #all other sections df
     other_sections_gamma= pd.DataFrame(gamma_optimal_user_error_df.iloc[:,2:8])
     linear_regression_plot(other_sections_gamma.values[46],'section','behavior gamma','linear regression of behavior gamma in each section')
+    r_m_gamma_df=linear_regression_from_df(other_sections_gamma,'m_gamma','r_gamma')
+
+
+    [r_m_number_of_poses_df,r_m_min_matrix_df, r_m_sum_matrix_df,r_m_task_error_real_matrix_df,r_m_gamma_df]
 
 # figure_5()
 
@@ -310,7 +356,8 @@ measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetna
 # measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
 # in section 2, only with more than 3
 # measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
-# measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['behavior_gamma_0'] < 100]
+measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['behavior_gamma_1'] < 100]
+
 
 
 
@@ -327,8 +374,8 @@ all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['Openne
                              external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
 
 
-all_measures = pd.concat([measures_data['section_1'], measures_data['section_2'],
-                          measures_data['section_other'], measures_data['section_9']], axis=1)
+all_measures = pd.concat([measures_data['section_1'][['subject_number_of_poses_0','task_error_real_matrix_results_0','task_error_subject_matrix_results_0']],
+                          measures_data['section_2'], measures_data['section_other'], measures_data['section_9']], axis=1)
 
 all_data_df=pd.concat([all_measures, all_external_data,], axis=1)
 
@@ -482,28 +529,30 @@ def figure_9():
     factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
 
     interesting_measures = ['psychometric_grade', 'AQ_total_score', 'Openness', 'Neuroticism',
-                            'CEI_II_Total']
+                            'CEI_II_Total','average_grades']
 
     for i_m in interesting_measures:
-        #after we have study data, change CEI
         the_formula = i_m + ' ~ '
         for fn in factor_names:
-            the_formula += fn + ' *'
+            the_formula += fn + ' +'
         the_formula = the_formula[:-2]
         print(the_formula)
         result = sm.ols(formula=the_formula, data=factors_and_external_df).fit()
         print result.summary()
 
-#matan's play
 def figure_10():
-    result = sm.ols(formula="subject_number_of_poses_0  ~ C(gender) -1",
+    result = sm.ols(formula="Openness ~ subject_number_of_poses_0",
                     data=all_data_df).fit()
     print result.summary()
 
 
-    result = sm.ols(formula=" AQ_total_score ~ subject_number_of_poses_0",
+    result = sm.ols(formula="Neuroticism ~ task_error_real_matrix_results_1",
                     data=all_data_df).fit()
     print result.summary()
 
 
-figure_9()
+    result = sm.ols(formula="average_grades ~ task_error_subject_matrix_results_0 + task_error_subject_matrix_results_1 ",
+                    data=all_data_df).fit()
+    print result.summary()
+
+figure_10()

@@ -13,8 +13,18 @@ import matplotlib
 matplotlib.style.use('ggplot')
 
 poses = pickle.load(open('data/data_of_poses_21', 'rb'))
-
-# poses = pickle.load(open('data/data_of_poses_21', 'r')) #for home computer
+#mirror_matrix
+mirror_matrix=np.eye(8)
+mirror_matrix[0, 0] = 0
+mirror_matrix[4, 4] = 0
+mirror_matrix[0, 4] = 1
+mirror_matrix[4, 0] = 1
+mirror_matrix[1, 1] = 0
+mirror_matrix[5, 5] = 0
+mirror_matrix[1, 5] = -1
+mirror_matrix[5, 1] = -1
+mirror_matrix = mirror_matrix[(0, 1, 4, 5),]
+mirror_matrix = mirror_matrix[:, (0, 1, 4, 5)]
 
 # createing matrix error:
 matrix_error = {}
@@ -68,13 +78,13 @@ for subject_id, step in poses.items():
 
                 #NO Data in the the matrix_error[subject_id][step_id]['error']
                 if len(matrix_error[subject_id][step_id]['error'])==0:
-                    matrix_error[subject_id][step_id]['min_error'] = None
-                    matrix_error[subject_id][step_id]['best_matrix'] = None
+                    matrix_error[subject_id][step_id]['error'].append(np.linalg.norm(matrix-mirror_matrix)/16)
+                    matrix_error[subject_id][step_id]['matrix'].append(mirror_matrix)
 
-                else:
-                    argmin_for_best_error=np.argmin(matrix_error[subject_id][step_id]['error'])
-                    matrix_error[subject_id][step_id]['min_error']=matrix_error[subject_id][step_id]['error'][argmin_for_best_error]
-                    matrix_error[subject_id][step_id]['best_matrix']=matrix_error[subject_id][step_id]['matrix'][argmin_for_best_error]
+
+                argmin_for_best_error=np.argmin(matrix_error[subject_id][step_id]['error'])
+                matrix_error[subject_id][step_id]['min_error']=matrix_error[subject_id][step_id]['error'][argmin_for_best_error]
+                matrix_error[subject_id][step_id]['best_matrix']=matrix_error[subject_id][step_id]['matrix'][argmin_for_best_error]
 
 pickle.dump(obj=matrix_error, file=open('data/matrix_error_data', 'wb'))
 
