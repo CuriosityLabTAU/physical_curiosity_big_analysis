@@ -308,9 +308,11 @@ measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetna
 # measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['sum_matrix_error_0'] < 100]
 # min matrix error cannot be too big
 # measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
-
 # in section 2, only with more than 3
 # measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
+# measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['behavior_gamma_0'] < 100]
+
+
 
 ## external data:
 external_AQ = pd.read_excel("data/AQ_scores.xlsx")
@@ -321,7 +323,7 @@ external_tablet=pd.read_excel("data/data_from_tablet.xlsx")
 subject_id_for_tablet=external_tablet['subject_id']
 external_tablet.index=subject_id_for_tablet
 
-all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['BFI_total_score'],
+all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['Openness'], external_BFI['Neuroticism'],
                              external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
 
 
@@ -456,7 +458,7 @@ def figure_9():
     plt.plot(ev)
     # plt.show()
 
-    n_factors = 4
+    n_factors = 2
     fa.analyze(all_measures, n_factors, rotation='promax')
     for i in range(1, 1 + n_factors):
         factor_name = 'Factor%d' % i
@@ -465,22 +467,32 @@ def figure_9():
 
     x = np.zeros([all_measures.shape[0], n_factors])
     for i in range(1, 1 + n_factors):
+        factor_name = 'Factor%d' % i
         # print(np.expand_dims(fa.loadings[factor_name], 1).shape)
         # print(all_measures.values.shape)
         x[:, i-1] = np.squeeze(np.dot(all_measures.values,  np.expand_dims(fa.loadings[factor_name], 1)))
 
 
     # convert x into data_frame, columns = factor_1, factor_2
-    factor_df = pd.DataFrame(x, columns=['factor_1','factor_2','factor_3','factor_4'],index=all_measures.index)
-    print factor_df.shape
+    factor_names = ['factor_%d' % s for s in range(n_factors)]
+    factor_df = pd.DataFrame(x, columns=factor_names,index=all_measures.index)
+    print factor_df
 
     # factor df and external_data df:
     factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
 
-    #after we have study data, change CEI
-    result = sm.ols(formula="psychometric_grade ~ factor_1 + factor_2 +factor_3 + factor_4",
-                    data=factors_and_external_df).fit()
-    print result.summary()
+    interesting_measures = ['psychometric_grade', 'AQ_total_score', 'Openness', 'Neuroticism',
+                            'CEI_II_Total']
+
+    for i_m in interesting_measures:
+        #after we have study data, change CEI
+        the_formula = i_m + ' ~ '
+        for fn in factor_names:
+            the_formula += fn + ' *'
+        the_formula = the_formula[:-2]
+        print(the_formula)
+        result = sm.ols(formula=the_formula, data=factors_and_external_df).fit()
+        print result.summary()
 
 #matan's play
 def figure_10():
@@ -493,3 +505,5 @@ def figure_10():
                     data=all_data_df).fit()
     print result.summary()
 
+
+figure_9()
