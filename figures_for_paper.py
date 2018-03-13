@@ -334,7 +334,9 @@ def figure_5():
 
 
     [r_m_number_of_poses_df,r_m_min_matrix_df, r_m_sum_matrix_df,r_m_task_error_real_matrix_df,r_m_gamma_df]
-
+    #todo: df with all and min
+    #todo: max on min
+    #todo:plot the 5 linar
 # figure_5()
 
 
