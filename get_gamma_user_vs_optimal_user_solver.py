@@ -105,11 +105,11 @@ for subject_id, step in poses.items():
                 size=min(len(real_poses_skeleton),len(real_poses_robot))
 
                 if size<4:
-                    gamma_optimal_user_error[subject_id][step_id] = 100
+                    gamma_optimal_user_error[subject_id][step_id] = matrix_error[subject_id][step_id]['min_error']
                     continue
 
                 optimal_user_error[subject_id][step_id]=find_optimal_error_sequence(real_poses_skeleton[:size], real_poses_robot[:size],matrix)
-                gamma=np.nansum(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
+                gamma=np.nanmean(np.array(matrix_error[subject_id][step_id]['error'][:size]) - np.array(optimal_user_error[subject_id][step_id]))
 
                 gamma_optimal_user_error[subject_id][step_id] = gamma
                 optimal_user_error_sequence[subject_id][step_id] = optimal_user_error[subject_id][step_id]

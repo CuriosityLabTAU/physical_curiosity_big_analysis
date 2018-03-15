@@ -222,7 +222,7 @@ def figure_5():
             if 'error' in errors.keys():
                 if len(errors['error']) > 0:
                     min_error = min(errors['error'])
-                    sum_error = np.nansum(errors['error'])
+                    sum_error = np.nanmean(errors['error'])
                     min_dict[subject_id][step_id] = min_error
                     sum_dict[subject_id][step_id] = sum_error
                 else:
