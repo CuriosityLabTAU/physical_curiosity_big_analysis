@@ -6,16 +6,18 @@ import numpy as np
 import pandas as pd
 import statsmodels.formula.api as sm
 from factor_analyzer import FactorAnalyzer
+from scipy.stats import zscore
 
 
 # load all the relevant data
 # raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
 matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
 optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
-subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'r'))
-tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'r'))
-tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'r'))
-gamma_optimal_user_error_df = pickle.load(open('data/gamma_user_vs_optimal_user', 'r'))
+subject_number_of_poses = pickle.load(open('data/subject_number_of_poses_goren', 'rb'))
+tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix_goren', 'rb'))
+tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix_goren', 'rb'))
+# gamma_optimal_user_error_df = pickle.load(open('data/gamma_optimal_user_error_df_goren', 'r'))
+gamma_optimal_user_error_df = pd.read_csv('data/gamma_optimal_user_error_df_goren.csv')
 
 
 # === data processing ===
@@ -360,7 +362,7 @@ def figure_5():
     #todo: max on min
     #todo:plot the 5 linar
 
-figure_5()
+# figure_5()
 
 
 
@@ -381,7 +383,10 @@ measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetna
 # measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
 # in section 2, only with more than 3
 # measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['subject_number_of_poses_1'] > 3]
+measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['behavior_gamma_0'] < 100]
+measures_data['section_1'] = measures_data['section_1'][measures_data['section_1']['min_matrix_error_0'] < 1]
 measures_data['section_2'] = measures_data['section_2'][measures_data['section_2']['behavior_gamma_1'] < 100]
+
 
 
 
@@ -395,11 +400,13 @@ external_tablet=pd.read_excel("data/data_from_tablet.xlsx")
 subject_id_for_tablet=external_tablet['subject_id']
 external_tablet.index=subject_id_for_tablet
 
-all_external_data=pd.concat([external_AQ['AQ_total_score'], external_BFI['Openness'], external_BFI['Neuroticism'],
+all_external_data=pd.concat([external_BFI['Openness'], external_BFI['Neuroticism'],
                              external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
+all_external_data = pd.concat([external_AQ['AQ_total_score'], external_BFI['Openness'], external_BFI['Neuroticism'],
+                               external_general[['age', 'gender', 'average_grades', 'psychometric_grade']],
+                               external_tablet['CEI_II_Total']], axis=1)
 
-
-all_measures = pd.concat([measures_data['section_1'][['subject_number_of_poses_0','task_error_real_matrix_results_0','task_error_subject_matrix_results_0']],
+all_measures = pd.concat([measures_data['section_1'],
                           measures_data['section_2'], measures_data['section_other'], measures_data['section_9']], axis=1)
 
 all_data_df=pd.concat([all_measures, all_external_data,], axis=1)
@@ -523,14 +530,16 @@ def figure_8b():
 # ad_hoc (figure 7) ==> 3 measures
 
 
+
 def figure_9():
+
     fa = FactorAnalyzer()
     fa.analyze(all_measures, len(all_measures.columns), rotation='promax')
     ev, v = fa.get_eigenvalues()
     plt.plot(ev)
     # plt.show()
 
-    n_factors = 2
+    n_factors = 4
     fa.analyze(all_measures, n_factors, rotation='promax')
     for i in range(1, 1 + n_factors):
         factor_name = 'Factor%d' % i
@@ -542,13 +551,17 @@ def figure_9():
         factor_name = 'Factor%d' % i
         # print(np.expand_dims(fa.loadings[factor_name], 1).shape)
         # print(all_measures.values.shape)
-        x[:, i-1] = np.squeeze(np.dot(all_measures.values,  np.expand_dims(fa.loadings[factor_name], 1)))
+        relevant_factors = abs(fa.loadings[factor_name]) > 0.4
+        weighted_measures = fa.loadings[factor_name][relevant_factors] / np.sum(abs(fa.loadings[factor_name][relevant_factors]))
+        relevant_measures = all_measures.values[:, relevant_factors.values]
+        x[:, i - 1] = np.squeeze(np.dot(relevant_measures, np.expand_dims(weighted_measures, 1)))
+        # x[:, i-1] = np.squeeze(np.dot(all_measures.values,  np.expand_dims(fa.loadings[factor_name], 1)))
 
 
     # convert x into data_frame, columns = factor_1, factor_2
     factor_names = ['factor_%d' % s for s in range(n_factors)]
     factor_df = pd.DataFrame(x, columns=factor_names,index=all_measures.index)
-    print factor_df
+    # print factor_df
 
     # factor df and external_data df:
     factors_and_external_df = pd.concat([factor_df, all_external_data], axis=1)
@@ -559,7 +572,7 @@ def figure_9():
     for i_m in interesting_measures:
         the_formula = i_m + ' ~ '
         for fn in factor_names:
-            the_formula += fn + ' +'
+            the_formula += fn + ' *'
         the_formula = the_formula[:-2]
         print(the_formula)
         result = sm.ols(formula=the_formula, data=factors_and_external_df).fit()
@@ -580,4 +593,11 @@ def figure_10():
                     data=all_data_df).fit()
     print result.summary()
 
-figure_10()
+
+def figure_11():
+    pass
+
+
+all_measures = all_measures.dropna().apply(zscore)
+print(all_measures)
+figure_9()
