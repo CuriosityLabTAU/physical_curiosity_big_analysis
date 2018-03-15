@@ -324,6 +324,8 @@ def figure_5():
     #all other sections:
     other_sections_task_error_subject_matrix_results_data= pd.DataFrame(task_error_subject_matrix_results_df.iloc[:,2:])
     linear_regression_plot(other_sections_task_error_subject_matrix_results_data.values[20],'section','task error','linear regression of task error subject matrix in each section')
+    r_m_task_error_subject_matrix_df = linear_regression_from_df(other_sections_task_error_subject_matrix_results_data,'m_task_error_subject_matrix','r_task_error_subject_matrix')
+
 
     ##-- Behavior gamma--
 
@@ -332,12 +334,33 @@ def figure_5():
     linear_regression_plot(other_sections_gamma.values[46],'section','behavior gamma','linear regression of behavior gamma in each section')
     r_m_gamma_df=linear_regression_from_df(other_sections_gamma,'m_gamma','r_gamma')
 
+    m_df=pd.concat([r_m_number_of_poses_df['m_subject_number_of_poses'],r_m_min_matrix_df['m_min_matrix'],
+                    r_m_sum_matrix_df['m_sum_matrix'], r_m_task_error_real_matrix_df['m_task_error_real_matrix'],
+                    r_m_task_error_subject_matrix_df['m_task_error_subject_matrix'],r_m_gamma_df['m_gamma']], axis=1)
 
-    [r_m_number_of_poses_df,r_m_min_matrix_df, r_m_sum_matrix_df,r_m_task_error_real_matrix_df,r_m_gamma_df]
+    r_df=pd.concat([r_m_number_of_poses_df['r_subject_number_of_poses'],r_m_min_matrix_df['r_min_matrix'],
+                    r_m_sum_matrix_df['r_sum_matrix'], r_m_task_error_real_matrix_df['r_task_error_real_matrix'],
+                    r_m_task_error_subject_matrix_df['r_task_error_subject_matrix'],r_m_gamma_df['r_gamma']], axis=1)
+
+    r_df['min_r'] = r_df[['r_subject_number_of_poses', 'r_min_matrix', 'r_sum_matrix', 'r_task_error_real_matrix',
+                              'r_task_error_subject_matrix','r_gamma']].min(axis=1)
+    subject_max_min_r=r_df['min_r'].idxmax(axis=0)
+
+    # for i in
+    #     sns.set_style("darkgrid", {"axes.facecolor": ".9"})
+    #
+    #     plt.plot(x, y, '.')
+    #     plt.plot(x, m * x, '-')
+    #
+    #     plt.ylabel(_ylabel)
+    #     plt.xlabel(_xlabel)
+    #     plt.title(_title)
+    #     plt.show()
     #todo: df with all and min
     #todo: max on min
     #todo:plot the 5 linar
-# figure_5()
+
+figure_5()
 
 
 
