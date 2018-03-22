@@ -41,7 +41,7 @@ for subject_id, step in poses.items():
         for section_id in step.keys():
 
             if section_id=='learn':
-                if subject_id==18:
+                if subject_id==1017:
                     if step_id==0:
                         pass
 
@@ -63,7 +63,7 @@ for subject_id, step in poses.items():
                     if i < 3:
                         continue
 
-                    pinv_skeleton = pinv(skeleton_vectors,0.00001)
+                    pinv_skeleton = pinv(skeleton_vectors,0.000001)
                     # Amat = np.dot(pinv_skeleton, robot_vectors)
                     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
