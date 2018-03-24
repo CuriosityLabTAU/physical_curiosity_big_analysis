@@ -13,11 +13,11 @@ from scipy.stats import zscore
 # raw_data = pickle.load(open('data/raw_data_all_merged', 'r'))
 matrix_error_data = pickle.load(open('data/matrix_error_data', 'r'))
 optimal_user_error_sequence= pickle.load(open('data/optimal_user_error_sequence', 'r'))
-subject_number_of_poses = pickle.load(open('data/subject_number_of_poses_goren', 'rb'))
-tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix_goren', 'rb'))
-tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix_goren', 'rb'))
-# gamma_optimal_user_error_df = pickle.load(open('data/gamma_optimal_user_error_df_goren', 'r'))
-gamma_optimal_user_error_df = pd.read_csv('data/gamma_optimal_user_error_df_goren.csv')
+subject_number_of_poses = pickle.load(open('data/subject_number_of_poses', 'rb'))
+tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'rb'))
+tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'rb'))
+gamma_optimal_user_error_df = pickle.load(open('data/optimal_user_error_sequence', 'r'))
+# gamma_optimal_user_error_df = pd.read_csv('data/gamma_optimal_user_error_df_goren.csv')
 
 
 # === data processing ===
@@ -600,4 +600,32 @@ def figure_11():
 
 all_measures = all_measures.dropna().apply(zscore)
 print(all_measures)
-figure_9()
+# figure_9()
+
+
+
+def figure_12():
+    # hist of matrix and measures
+    measures = ['number_of_poses', 'min_matrix_error', 'sum_matrix_error', 'task_error_real_matrix',
+                'task_error_subject_matrix', 'behavior_gamma']
+    matrices = [0, 1, 2, 3, 4, 5, 6, 7]
+
+    # subplot
+    for measure in measures:
+        sec_data = step_data[[measure,'matrix']]
+
+        fig = plt.figure()
+        fig.subplots_adjust(hspace=0.4, wspace=0.4)
+        i=1
+        for mat in matrices:
+            ax = fig.add_subplot(3, 3, i)
+            sec_data.loc[sec_data['matrix'] == mat]
+            ax.hist(sec_data.loc[sec_data['matrix'] == mat][measure].values)
+            i+=1
+            ax.set_title('%s' %(mat))
+
+        fig.suptitle(measure)
+        plt.show()
+
+
+figure_12()

@@ -63,7 +63,7 @@ for subject_id, step in poses.items():
                     if i < 3:
                         continue
 
-                    pinv_skeleton = pinv(skeleton_vectors,0.000001)
+                    pinv_skeleton = pinv(skeleton_vectors,0.000000001)
                     # Amat = np.dot(pinv_skeleton, robot_vectors)
                     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 

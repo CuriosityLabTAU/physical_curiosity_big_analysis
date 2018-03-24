@@ -10,6 +10,7 @@ subprocess.call()
 # 3. tasks_error_real_matrix.py
 # 4. task_error_subject_matrix.py
 # 5. get_gamma_user_vs_optimal_user_solver.py
-# 6. data_collection.py
-# 7. all_data_file_builder.py
+# 8. all_data_file_builder.py
+# 9. data_collection.py
+
 
