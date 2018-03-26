@@ -11,6 +11,7 @@ subprocess.call()
 # 4. task_error_subject_matrix.py
 # 5. get_gamma_user_vs_optimal_user_solver.py
 # 8. all_data_file_builder.py
-# 9. data_collection.py
+# 9. all_data_normalization.py
+#10. data_collection.py
 
 

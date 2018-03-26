@@ -216,5 +216,5 @@ def data_collection(_in,_out):
     writer.save()
 
 
-data_collection("data/all_data.xlsx",'data/big_analysis_n.xlsx')
+data_collection("data/all_data.xlsx",'data/big_analysis.xlsx')
 data_collection("data/all_data_normalized.xlsx",'data/big_analysis_normalized.xlsx')

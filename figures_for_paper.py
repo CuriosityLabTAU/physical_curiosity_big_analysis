@@ -7,6 +7,9 @@ import pandas as pd
 import statsmodels.formula.api as sm
 from factor_analyzer import FactorAnalyzer
 from scipy.stats import zscore
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2 ,f_regression, mutual_info_regression
+from copy import *
 
 
 # load all the relevant data
@@ -369,10 +372,10 @@ def figure_5():
 
 # === data analysis ====
 measures_data = {}
-measures_data['section_1'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_0')
-measures_data['section_2'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_1')
-measures_data['section_9'] = pd.read_excel('data/big_analysis.xlsx', sheetname='section_9')
-measures_data['section_other'] = pd.read_excel('data/big_analysis.xlsx', sheetname='other_sections')
+measures_data['section_1'] = pd.read_excel('data/big_analysis_normalized.xlsx', sheetname='section_0')
+measures_data['section_2'] = pd.read_excel('data/big_analysis_normalized.xlsx', sheetname='section_1')
+measures_data['section_9'] = pd.read_excel('data/big_analysis_normalized.xlsx', sheetname='section_9')
+measures_data['section_other'] = pd.read_excel('data/big_analysis_normalized.xlsx', sheetname='other_sections')
 
 # remove outliers
 # in section 1, only those who did something
@@ -447,10 +450,10 @@ def figure_7():
 # figure 8: do participants who explore more learn more with time
 # formula: (\delta^i | \tilde\delta) ~ matrix^i + i + (n_pose^i | b_...)
 
-step_data = pd.read_excel('data/all_data.xlsx')
-step_data = step_data[step_data['task_error_real_matrix'] < 100]
+step_data = pd.read_excel('data/all_data_normalized.xlsx')
+# step_data = step_data[step_data['task_error_real_matrix'] < 100]
 # step_data = step_data[step_data['min_matrix_error'] < 1]
-step_data = step_data[step_data['sum_matrix_error'] < 100]
+# step_data = step_data[step_data['sum_matrix_error'] < 100]
 
 
 def figure_8():
@@ -488,7 +491,7 @@ def figure_8():
     # they did not improve in local/micro exploration
     # they did improve their exploration strategy
 
-
+# figure_8()
 
 # figure 8.a: x-axis: number of poses, y-axis:task_error_real_matrix
 #       plot all data points, and the linear line that describes them
@@ -572,39 +575,36 @@ def figure_9():
     for i_m in interesting_measures:
         the_formula = i_m + ' ~ '
         for fn in factor_names:
-            the_formula += fn + ' *'
+            the_formula += fn + ' +'
         the_formula = the_formula[:-2]
         print(the_formula)
         result = sm.ols(formula=the_formula, data=factors_and_external_df).fit()
         print result.summary()
 
 def figure_10():
-    result = sm.ols(formula="Openness ~ subject_number_of_poses_0",
-                    data=all_data_df).fit()
-    print result.summary()
+    interesting_measures = ['psychometric_grade', 'AQ_total_score', 'Openness', 'Neuroticism',
+                            'CEI_II_Total','average_grades']
+    measures=['m_behavior_gamma','m_task_error_real_matrix_results']
+
+    for i_m in interesting_measures:
+        the_formula = i_m + ' ~ '
+        for measure in measures:
+            the_formula += measure + ' +'
+        the_formula = the_formula[:-2]
+        print(the_formula)
+        result = sm.ols(formula=the_formula, data=all_data_df).fit()
+        print result.summary()
 
 
-    result = sm.ols(formula="Neuroticism ~ task_error_real_matrix_results_1",
-                    data=all_data_df).fit()
-    print result.summary()
-
-
-    result = sm.ols(formula="average_grades ~ task_error_subject_matrix_results_0 + task_error_subject_matrix_results_1 ",
-                    data=all_data_df).fit()
-    print result.summary()
-
-
-def figure_11():
-    pass
-
+# figure_10()
 
 all_measures = all_measures.dropna().apply(zscore)
-print(all_measures)
+# print(all_measures)
 # figure_9()
 
 
 
-def figure_12():
+def figure_11():
     # hist of matrix and measures
     measures = ['number_of_poses', 'min_matrix_error', 'sum_matrix_error', 'task_error_real_matrix',
                 'task_error_subject_matrix', 'behavior_gamma']
@@ -627,5 +627,104 @@ def figure_12():
         fig.suptitle(measure)
         plt.show()
 
+def all_subsets(xs):
+  if not xs:
+    return [[]]
+  else:
+    x = xs.pop()
+    subsets = all_subsets(xs)
+    subsets_copy = deepcopy(subsets) # NB you need to use a deep copy here!
+    for s in subsets_copy:
+      s.append(x)
+    subsets.extend(subsets_copy)
+    return subsets
 
-figure_12()
+def figure_12():
+    interesting_measures = ['psychometric_grade', 'AQ_total_score', 'Openness', 'Neuroticism',
+                            'CEI_II_Total','average_grades']
+
+    measure_data = list(all_data_df)[:-8]
+    i_m= 'CEI_II_Total'
+    results_dic={}
+    sets=all_subsets([i for i in range(len(measure_data))])
+
+    counter = len(sets)
+    for i_m in interesting_measures:
+        results_dic[i_m]=[]
+        print "~~~~~~~~~~~~~~~~~~~"+i_m+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        for set in sets:
+            if len(set) > 0:
+                if len(set)<6:
+                    measures= [measure_data[i] for i in set]
+
+                    the_formula = i_m + ' ~ '
+                    for measure in measures:
+                        the_formula += measure + ' +'
+                    the_formula = the_formula[:-2]
+
+                    result = sm.ols(formula=the_formula, data=all_data_df).fit()
+
+                    if result.f_pvalue <0.05:
+                        pvalue=result.f_pvalue
+                        rsquared=result.rsquared
+                        results_dic[i_m].append(([pvalue, rsquared,measures]))
+
+                        print "last p= ",result.f_pvalue,"last r= ",rsquared
+
+    writer = pd.ExcelWriter('data/OLS_fit.xlsx', engine='xlsxwriter')
+
+    for i_m in interesting_measures:
+
+        i_m_df=pd.DataFrame(results_dic[i_m],columns=['pvalue','rsquared','measures'])
+
+        i_m_df.to_excel(writer, sheet_name='%s' %i_m )
+
+        # Close the Pandas Excel writer and output the Excel file.
+    writer.save()
+
+
+
+
+def figure_13():
+    result = sm.ols(formula="psychometric_grade ~ m_behavior_gamma",
+                    data=all_data_df).fit()
+    print result.summary()
+
+figure_13()
+
+def figure_14():
+    result = sm.ols(formula="task_error_real_matrix ~ step_id + number_of_poses ",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: matrix effected, number of poses effect task error
+    #             step_id is not correlated,
+    # ==> they did not reduce the task error with steps (time)
+
+    # result = sm.ols(formula="task_error_subject_matrix ~ step_id + C(matrix) + number_of_poses -1",
+    #                 data=step_data).fit()
+    # print result.summary()
+
+
+    result = sm.ols(formula="min_matrix_error ~ step_id  ",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+
+    result = sm.ols(formula="sum_matrix_error ~ step_id ",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+
+    result = sm.ols(formula="behavior_gamma ~ step_id  ",
+                    data=step_data).fit()
+    print result.summary()
+    # conclusion: subjects improved their exploration with time
+    #    ==> participants improved their poses selection, but not order
+    #    ==> learned "macro" exploration, but not "micro" exploration
+
+    # =====> the task was too hard to learn
+    # they did not improve in task performance
+    # they did not improve in local/micro exploration
+    # they did improve their exploration strategy
+
+# figure_14()
