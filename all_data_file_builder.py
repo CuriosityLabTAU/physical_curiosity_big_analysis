@@ -264,7 +264,8 @@ keys = [i for i in range(9)]
 task_real_matrix_three_columns_df=pd.melt(task_real_matrix_df,id_vars='subject_id', value_vars=keys, value_name='task_real_matrix')
 task_real_matrix_three_columns_df.columns=['subject_id','step_id','task_real_matrix']
 
-task_real_matrix_three_columns_df[[i for i in range(1,17)]] = task_real_matrix_three_columns_df.task_real_matrix.apply(pd.Series)
+task_real_matrix_three_columns_df[[i for i in range(1,17)]] = task_real_matrix_three_columns_df.task_real_matrix.apply(pd.Series)[[i for i in range(1,17)]]
+
 task_real_matrix_three_columns_df=task_real_matrix_three_columns_df.drop('task_real_matrix', axis=1)
 
 #Join

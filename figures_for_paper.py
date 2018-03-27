@@ -403,8 +403,10 @@ external_tablet=pd.read_excel("data/data_from_tablet.xlsx")
 subject_id_for_tablet=external_tablet['subject_id']
 external_tablet.index=subject_id_for_tablet
 
-all_external_data=pd.concat([external_BFI['Openness'], external_BFI['Neuroticism'],
-                             external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
+# all_external_data=pd.concat([external_BFI['Openness'], external_BFI['Neuroticism'],
+#                              external_general[['age', 'gender', 'average_grades', 'psychometric_grade']], external_tablet['CEI_II_Total']], axis=1)
+#
+
 all_external_data = pd.concat([external_AQ['AQ_total_score'], external_BFI['Openness'], external_BFI['Neuroticism'],
                                external_general[['age', 'gender', 'average_grades', 'psychometric_grade']],
                                external_tablet['CEI_II_Total']], axis=1)
@@ -644,7 +646,8 @@ def figure_12():
                             'CEI_II_Total','average_grades']
 
     measure_data = list(all_data_df)[:-8]
-    i_m= 'CEI_II_Total'
+    while "subject_id" in measure_data: measure_data.remove('subject_id')
+
     results_dic={}
     sets=all_subsets([i for i in range(len(measure_data))])
 
@@ -682,7 +685,7 @@ def figure_12():
         # Close the Pandas Excel writer and output the Excel file.
     writer.save()
 
-
+figure_12()
 
 
 def figure_13():
@@ -690,7 +693,6 @@ def figure_13():
                     data=all_data_df).fit()
     print result.summary()
 
-figure_13()
 
 def figure_14():
     result = sm.ols(formula="task_error_real_matrix ~ step_id + number_of_poses ",
@@ -727,4 +729,3 @@ def figure_14():
     # they did not improve in local/micro exploration
     # they did improve their exploration strategy
 
-# figure_14()

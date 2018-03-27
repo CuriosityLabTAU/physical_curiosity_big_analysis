@@ -1,10 +1,4 @@
 # how to run to get all files:
-
-import subprocess
-
-subprocess.call()
-
-
 # 1. number_of_poses.py
 # 2. matrix_error.py
 # 3. tasks_error_real_matrix.py
@@ -14,4 +8,21 @@ subprocess.call()
 # 9. all_data_normalization.py
 #10. data_collection.py
 
+import subprocess
+# files_to_run=['number_of_poses.py','matrix_error.py']
+files_to_run=[
+              'number_of_poses.py',
+              'matrix_error.py'
+              'tasks_error_real_matrix.py',
+              'task_error_subject_matrix.py',
+              'get_gamma_user_vs_optimal_user_solver.py',
+              'all_data_file_builder.py',
+              'all_data_normalization.py',
+              'data_collection.py'
+              ]
 
+
+for file in files_to_run:
+    cmd = ['python', file]
+    print "~~~~~~~~",file,"~~~~~~~~"
+    subprocess.Popen(cmd).wait()

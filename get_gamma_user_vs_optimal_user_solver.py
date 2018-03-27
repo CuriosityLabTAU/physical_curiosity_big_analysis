@@ -24,7 +24,7 @@ def calc_matrix_error(new_skeleton_vector,new_robot_vector, _skeleton_vectors,_r
     skeleton_vectors = np.vstack((_skeleton_vectors, new_skeleton_vector))
     robot_vectors = np.vstack((_robot_vectors, new_robot_vector))
 
-    pinv_skeleton = np.linalg.pinv(skeleton_vectors,0.00001)
+    pinv_skeleton = np.linalg.pinv(skeleton_vectors,0.01)
 
     Amat = np.dot(robot_vectors.T, pinv_skeleton.T)
 
