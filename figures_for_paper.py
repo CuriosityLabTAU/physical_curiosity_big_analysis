@@ -685,7 +685,7 @@ def figure_12():
         # Close the Pandas Excel writer and output the Excel file.
     writer.save()
 
-figure_12()
+# figure_12()
 
 
 def figure_13():
@@ -729,3 +729,46 @@ def figure_14():
     # they did not improve in local/micro exploration
     # they did improve their exploration strategy
 
+
+# =============== ROMAN =================
+def print_result(result):
+    print(result.summary())
+    print('F(%d, %d)=%2.1f, p=%2.4f, R=%2.2f, \\beta=%2.5f' %
+          (result.df_model, result.df_resid, result.fvalue, result.f_pvalue,
+           np.sqrt(result.rsquared) * np.sign(result.params.values[1]),
+           result.params.values[1]))
+
+step_data = step_data[step_data['step_id'] > 0]
+step_data = step_data[step_data['step_id'] < 8]
+def roman_figure_1():
+    the_measures = ['number_of_poses', 'min_matrix_error', 'sum_matrix_error', 'behavior_gamma',
+                    'task_error_real_matrix', 'task_error_subject_matrix']
+    the_formula = "%s ~ %s " % ('min_matrix_error', 'number_of_poses')
+    result = sm.ols(formula=the_formula, data=step_data).fit()
+    print_result(result)
+
+    the_formula = "%s ~ %s " % ('sum_matrix_error', 'number_of_poses')
+    result = sm.ols(formula=the_formula, data=step_data).fit()
+    print_result(result)
+
+    the_formula = "%s ~ %s " % ('behavior_gamma', 'number_of_poses')
+    result = sm.ols(formula=the_formula, data=step_data).fit()
+    print_result(result)
+
+    the_formula = "%s ~ %s " % ('task_error_real_matrix', 'min_matrix_error')
+    result = sm.ols(formula=the_formula, data=step_data).fit()
+    print_result(result)
+
+    the_formula = "%s ~ %s " % ('task_error_subject_matrix', 'min_matrix_error')
+    result = sm.ols(formula=the_formula, data=step_data).fit()
+    print_result(result)
+
+def roman_figure_2():
+    the_measures = ['number_of_poses', 'min_matrix_error', 'sum_matrix_error', 'behavior_gamma',
+                    'task_error_real_matrix', 'task_error_subject_matrix']
+    for the_measure in the_measures:
+        the_formula = "%s ~ step_id + C(matrix) - 1" % the_measure
+        result = sm.ols(formula=the_formula, data=step_data).fit()
+        print(result.summary())
+
+roman_figure_2()
