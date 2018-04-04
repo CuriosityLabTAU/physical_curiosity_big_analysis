@@ -81,54 +81,6 @@ sum_matrix_error_three_columns_df.columns=['subject_id','step_id','sum_matrix_er
 three_columns_df = pd.merge(three_columns_df, min_matrix_error_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
 three_columns_df = pd.merge(three_columns_df, sum_matrix_error_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
 
-
-##Task error - real matrix:
-#lode data
-tasks_error_real_matrix = pickle.load(open('data/tasks_error_real_matrix', 'rb'))
-
-#crate df:
-pass_threshold=20
-
-task_error_real_matrix_results={}
-for subject_id, step in tasks_error_real_matrix.items():
-
-    task_error_real_matrix_results[subject_id] = {}
-
-    for step_id, step in step.items():
-
-        task_error_real_matrix_results[subject_id][step_id] = 0
-
-        step_results=[]
-
-        for section_id in step.keys():
-
-            if 'min_error' in tasks_error_real_matrix[subject_id][step_id][section_id].keys():
-
-                step_results.append(tasks_error_real_matrix[subject_id][step_id][section_id]['min_error'])
-
-
-
-        if len(step_results)>0:
-            task_error_real_matrix_results[subject_id][step_id]=np.nanmean(step_results)
-
-        else:
-            task_error_real_matrix_results[subject_id][step_id]=360
-
-task_error_real_matrix_results_df=pd.DataFrame.from_dict(task_error_real_matrix_results, orient='index')
-task_error_real_matrix_results_df.drop(task_error_real_matrix_results_df.columns[[0]], axis=1, inplace=True)
-
-task_error_real_matrix_results_df.reset_index(inplace=True)
-task_error_real_matrix_results_df.columns = ['subject_id']+[i for i in range(9)]
-
-keys = [i for i in range(9)]
-task_error_real_matrix_three_columns_df=pd.melt(task_error_real_matrix_results_df,id_vars='subject_id', value_vars=keys, value_name='task_error_real_matrix')
-task_error_real_matrix_three_columns_df.columns=['subject_id','step_id','task_error_real_matrix']
-
-#Join
-three_columns_df = pd.merge(three_columns_df, task_error_real_matrix_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
-
-
-
 ##Task error - subject matrix:
 #lode data
 tasks_error_subject_matrix = pickle.load(open('data/tasks_error_subject_matrix', 'rb'))
@@ -272,6 +224,13 @@ task_real_matrix_three_columns_df=task_real_matrix_three_columns_df.drop('task_r
 three_columns_df = pd.merge(three_columns_df, task_real_matrix_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
 
 #######################
+##Task error - real matrix:
+
+#crate df:
+task_error=three_columns_df[[i for i in range(1,17)]].mean(axis=1)
+three_columns_df['task_error_real_matrix']=task_error
+
+######################
 
 
 ##export to excel
