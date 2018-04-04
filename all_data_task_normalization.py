@@ -174,6 +174,10 @@ task_real_matrix_three_columns_df[[i for i in range(1,17)]] = task_real_matrix_t
 
 task_real_matrix_three_columns_df=task_real_matrix_three_columns_df.drop('task_real_matrix', axis=1)
 
+# normalization
+for i in range(1,17):
+    task_real_matrix_three_columns_df.loc[:,i] = task_real_matrix_three_columns_df.loc[:,i].values - task_real_matrix_three_columns_df.loc[:,i].dropna().values.mean()
+
 #Join
 three_columns_df = pd.merge(three_columns_df, task_real_matrix_three_columns_df,  how='left', left_on=['subject_id','step_id'], right_on = ['subject_id','step_id'])
 
@@ -223,6 +227,11 @@ task_subject_matrix_three_columns_df.columns=['subject_id','step_id','task_subje
 task_subject_matrix_three_columns_df[[i for i in range(1,17)]] = task_subject_matrix_three_columns_df.task_subject_matrix.apply(pd.Series)[[i for i in range(1,17)]]
 
 task_subject_matrix_three_columns_df=task_subject_matrix_three_columns_df.drop('task_subject_matrix', axis=1)
+
+# normalization
+for i in range(1,17):
+    task_subject_matrix_three_columns_df.loc[:,i] = task_subject_matrix_three_columns_df.loc[:,i].values - task_subject_matrix_three_columns_df.loc[:,i].dropna().values.mean()
+
 #######################
 
 
@@ -246,7 +255,7 @@ three_columns_df['task_error_subject_matrix']=task_subject_matrix
 
 ##export to excel
 # Create a Pandas Excel writer using XlsxWriter as the engine.
-writer = pd.ExcelWriter('data/all_data.xlsx', engine='xlsxwriter')
+writer = pd.ExcelWriter('data/all_data_task_normalized.xlsx', engine='xlsxwriter')
 
 # Write each dataframe to a different worksheet.
 three_columns_df.to_excel(writer, sheet_name='all_data')

@@ -493,7 +493,7 @@ def figure_8():
     # they did not improve in local/micro exploration
     # they did improve their exploration strategy
 
-figure_8()
+# figure_8()
 
 # figure 8.a: x-axis: number of poses, y-axis:task_error_real_matrix
 #       plot all data points, and the linear line that describes them
@@ -771,4 +771,4 @@ def roman_figure_2():
         result = sm.ols(formula=the_formula, data=step_data).fit()
         print(result.summary())
 
-# roman_figure_2()
+roman_figure_1()

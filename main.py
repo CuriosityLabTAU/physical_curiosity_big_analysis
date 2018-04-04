@@ -5,8 +5,9 @@
 # 4. task_error_subject_matrix.py
 # 5. get_gamma_user_vs_optimal_user_solver.py
 # 8. all_data_file_builder.py
-# 9. all_data_normalization.py
-#10. data_collection.py
+# 9. all_data_task_normalization.py
+#10. all_data_matrix_normalization.py
+#11. data_collection.py
 
 import subprocess
 # files_to_run=['number_of_poses.py','matrix_error.py']
@@ -17,7 +18,8 @@ files_to_run=[
               'task_error_subject_matrix.py',
               'get_gamma_user_vs_optimal_user_solver.py',
               'all_data_file_builder.py',
-              'all_data_normalization.py',
+              'all_data_task_normalization.py',
+              'all_data_matrix_normalization.py',
               'data_collection.py'
               ]
 
