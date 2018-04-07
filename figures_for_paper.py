@@ -729,6 +729,23 @@ def figure_14():
     # they did not improve in local/micro exploration
     # they did improve their exploration strategy
 
+#task analysis
+def figure_15():
+    #data for analysis:
+    step_data = pd.read_excel('data/all_data_normalized.xlsx')
+    new_df = pd.DataFrame(columns=['step_id', 'matrix', 'task_number', 'task_performance'])
+
+    for i in range(1, 17):
+        temp_df = step_data.loc[step_data[i].dropna().index][['step_id', 'matrix', i]]
+        temp_df = pd.melt(temp_df, id_vars=['step_id', 'matrix'], value_vars=i, value_name='task_performance')
+        temp_df.columns = ['step_id', 'matrix', 'task_number', 'task_performance']
+        new_df = new_df.append(temp_df)
+    new_df = new_df.astype("float")
+
+    #fit
+    result = sm.ols(formula="task_performance ~ step_id ",
+                    data=new_df).fit()
+    print result.summary()
 
 # =============== ROMAN =================
 def print_result(result):
@@ -771,4 +788,4 @@ def roman_figure_2():
         result = sm.ols(formula=the_formula, data=step_data).fit()
         print(result.summary())
 
-roman_figure_1()
+# roman_figure_1()
