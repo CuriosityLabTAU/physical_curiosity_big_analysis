@@ -747,6 +747,8 @@ def figure_15():
                     data=new_df).fit()
     print result.summary()
 
+
+
 # =============== ROMAN =================
 def print_result(result):
     print(result.summary())
