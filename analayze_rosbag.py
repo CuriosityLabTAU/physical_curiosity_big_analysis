@@ -20,7 +20,7 @@ sections = ['learn', 'task1', 'task2', 'task3']
 affdex_list=['emotions','expressions','measurements','face_points','face_x_alignment',
              'face_y_alignment','face_tracking_deltax','face_distance','face_detected','tega_affect_msg','attention_detected']
 
-mypath = '/home/matan/Desktop/data2/'
+mypath = '/home/matan/Desktop/new_data/'
 
 files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and '.bag' in f]
 subjects_with_no_angles_topic=[]
@@ -29,6 +29,10 @@ data = {}
 for f in files:
     info = f.split('_')
     subject_id = float(info[4])
+
+    if subject_id==1065:
+        continue
+
     print subject_id
 
     if subject_id > 0.0:
@@ -133,6 +137,7 @@ for f in files:
 
 
             if 'affdex' in topic:
+                # print msg
                 dict = {}
                 for m in affdex_list:
                     dict[m] = eval('msg.' + m)
@@ -203,6 +208,11 @@ for f in files:
 print(data.keys())
 print 'subjects_with_no_angles_topic: ',subjects_with_no_angles_topic
 
-pickle.dump(obj=data, file=open('data/raw_data_all_26_3', 'wb'))
+pickle.dump(obj=data, file=open('data/raw_data_10_10', 'wb'))
 
-
+data[subject_id][step][sections[section_id]]['data']= {
+                                    'time': (t - t0).to_sec(),
+                                    'skeleton': current_skeleton_angle,
+                                    'robot_cimmand': current_nao_command,
+                                    'robot': current_nao_movements,
+                                    'affdex': affdex}
